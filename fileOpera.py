@@ -160,11 +160,13 @@ def process_file(path, raw_file):
         exit(101)
 
 
-for i in os.walk(path_init):
-    for fileName in i[2]:
-        try:
-            process_file(path_init, fileName)
-            if path_init != path_processed:
-                move_file(path_init+fileName, path_processed+fileName, path_processed)
-        except Exception as e:
-            logger.fatal("FATAL ERROR: something error, exception is "+str(e)+".")
+while 1:
+    for i in os.walk(path_init):
+        for fileName in i[2]:
+            try:
+                process_file(path_init, fileName)
+                if path_init != path_processed:
+                    move_file(path_init+fileName, path_processed+fileName, path_processed)
+            except Exception as e:
+                logger.fatal("FATAL ERROR: something error, exception is "+str(e)+".")
+    time.sleep(10)
