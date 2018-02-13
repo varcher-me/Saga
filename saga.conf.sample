@@ -13,3 +13,7 @@ retry_seconds = 20
 [redis]
 redis_ip = '127.0.0.1'
 redis_port = '6379'
+
+[log]
+LOG_FILE = 'd:/temp/process.log'
+ERROR_FILE = 'd:/temp/error.log'

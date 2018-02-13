@@ -6,10 +6,10 @@ import time
 import os
 import shutil
 import traceback
-import logger
 import Calchash as calchash
 import redis
 import configparser
+import logger
 
 config = configparser.ConfigParser()
 config.read('saga.conf')
@@ -19,15 +19,12 @@ path_error = config.get('path', 'path_error')
 path_result = config.get('path', 'path_result')
 path_printed = config.get('path', 'path_printed')
 file_printed = config.get('path', 'file_printed')
-
-retry_interval = config.get('interval', 'retry_interval')
-retry_seconds = config.get('interval', 'retry_seconds')
-
+retry_interval = config.getfloat('interval', 'retry_interval')
+retry_seconds = config.getfloat('interval', 'retry_seconds')
 redis_ip = config.get('redis', 'redis_ip')
 redis_port = config.get('redis', 'redis_port')
 
 logger = logger.logger
-
 
 
 class FileOperaException(Exception):
@@ -174,6 +171,8 @@ while 1:
                 if path_init != path_processed:
                     move_file(path_init+fileName, path_processed+fileName, path_processed)
             except Exception as e:
-                logger.fatal("FATAL ERROR: something error, exception is "+str(e)+".")
+                except_string = "FATAL ERROR: something error, exception is >>>"+str(e)+"<<<."
+                print(except_string)
+                logger.fatal(except_string)
     print("Process finished or no file, sleep 10 seconds.")
     time.sleep(10)
