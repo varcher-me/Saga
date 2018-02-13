@@ -1,5 +1,6 @@
 import win32api
 from Class.Handler.AbstractHandler import AbstractHandler
+from Global import g
 
 
 class GdHandler(AbstractHandler):
@@ -20,6 +21,8 @@ class GdHandler(AbstractHandler):
         return
 
     def process(self, file_obj):
+        global a
+        print(a)
         self.open(self, file_obj)
         return
 
