@@ -9,19 +9,25 @@ import traceback
 import logger
 import Calchash as calchash
 import redis
+import configparser
 
-path_init = 'd:\\temp\\init\\'
-path_processed = 'd:\\temp\\processed\\'   # todo:改为正确目录1
-path_error = 'd:\\temp\\error\\'
-path_result = 'd:\\temp\\result\\'
-path_printed = 'd:\\temp\\'
-file_printed = 'PrintedPDF.pdf'
-retry_interval = 0.2
-retry_seconds = 20
+config = configparser.ConfigParser()
+config.read('saga.conf')
+path_init = config.get('path', 'path_init')
+path_processed = config.get('path', 'path_processed')
+path_error = config.get('path', 'path_error')
+path_result = config.get('path', 'path_result')
+path_printed = config.get('path', 'path_printed')
+file_printed = config.get('path', 'file_printed')
+
+retry_interval = config.get('interval', 'retry_interval')
+retry_seconds = config.get('interval', 'retry_seconds')
+
+redis_ip = config.get('redis', 'redis_ip')
+redis_port = config.get('redis', 'redis_port')
+
 logger = logger.logger
 
-redis_ip = '127.0.0.1'
-redis_port = '6379'
 
 
 class FileOperaException(Exception):
@@ -169,4 +175,5 @@ while 1:
                     move_file(path_init+fileName, path_processed+fileName, path_processed)
             except Exception as e:
                 logger.fatal("FATAL ERROR: something error, exception is "+str(e)+".")
+    print("Process finished or no file, sleep 10 seconds.")
     time.sleep(10)
