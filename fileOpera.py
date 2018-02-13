@@ -11,7 +11,7 @@ import Calchash as calchash
 import redis
 
 path_init = 'd:\\temp\\init\\'
-path_processed = 'd:\\temp\\processed\\'   # todo:改为正确目录
+path_processed = 'd:\\temp\\processed\\'   # todo:改为正确目录1
 path_error = 'd:\\temp\\error\\'
 path_result = 'd:\\temp\\result\\'
 path_printed = 'd:\\temp\\'
