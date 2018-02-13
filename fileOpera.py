@@ -12,7 +12,14 @@ import configparser
 import logger
 
 config = configparser.ConfigParser()
-config.read('saga.conf')
+if os.path.exists("saga.conf"):
+    config_file = 'saga.conf'
+elif os.path.exists("saga.conf.sample"):
+    config_file = "saga.conf.sample"
+else:
+    print("FATAL ERROR: config file cannot find.")
+    exit(200)
+config.read(config_file)
 path_init = config.get('path', 'path_init')
 path_processed = config.get('path', 'path_processed')
 path_error = config.get('path', 'path_error')
@@ -23,8 +30,10 @@ retry_interval = config.getfloat('interval', 'retry_interval')
 retry_seconds = config.getfloat('interval', 'retry_seconds')
 redis_ip = config.get('redis', 'redis_ip')
 redis_port = config.get('redis', 'redis_port')
+log_file = config.get('log', 'log_file')
+error_file = config.get('log', 'error_file')
 
-logger = logger.logger
+logger = logger.create_logger(log_file, error_file)
 
 
 class FileOperaException(Exception):

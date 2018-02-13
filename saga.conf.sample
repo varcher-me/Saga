@@ -11,9 +11,9 @@ retry_interval = 0.2
 retry_seconds = 20
 
 [redis]
-redis_ip = '127.0.0.1'
-redis_port = '6379'
+redis_ip = 127.0.0.1
+redis_port = 6379
 
 [log]
-LOG_FILE = d:\temp\process.log
-ERROR_FILE = d:\temp\error.log
+log_file = d:\temp\process.log
+error_file = d:\temp\error.log
