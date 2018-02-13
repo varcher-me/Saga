@@ -14,6 +14,12 @@ class SagaFile:
     def get_path_name(self):
         return self.__file_path + self.__file_name
 
+    def get_path(self):
+        return self.__file_path
+
+    def get_name(self):
+        return self.__file_name
+
     def get_file_ext(self):
         raw_name, ext = os.path.splitext(self.__file_name)
         return ext
@@ -25,3 +31,11 @@ class SagaFile:
     def move_file(self, new_path):
         # todo: finish move function
         return;
+
+    def set_handler(self, handler):
+        self.__file_handler = handler
+        return
+
+    def process(self):
+        self.__file_handler.process(self.__file_handler, self)
+        return

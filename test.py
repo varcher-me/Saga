@@ -1,5 +1,11 @@
 import Class.SagaFile.SagaFile as SagaFile
+import Class.Handler.testHandler as TestHandler
+import Class.Handler.GdHandler as GdHandler
 
 file = SagaFile.SagaFile('d:/temp/', 'hello.txt')
 
-print(file.get_path_name())
+handler = GdHandler.GdHandler
+
+file.set_handler(handler)
+file.process()
+
