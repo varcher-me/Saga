@@ -1,7 +1,8 @@
 import os
+import Class.SagaClass as SagaClass
 
 
-class SagaFile:
+class SagaFile(SagaClass):
     __file_path = ''
     __file_name = ''
     __file_handler = None

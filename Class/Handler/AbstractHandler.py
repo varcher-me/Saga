@@ -1,9 +1,10 @@
+import Class.SagaClass as SagaClass
 import abc
 import time
 import win32gui
 
 
-class AbstractHandler(metaclass=abc.ABCMeta):
+class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
     __hwnd = None
 
     def __init__(self):
