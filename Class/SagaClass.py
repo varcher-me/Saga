@@ -1,11 +1,16 @@
 import configparser
 import os
+import logger
 
 
 class SagaClass:
     params = {}
+    logger = None
 
     def __init__(self):
+        self.load_param()
+
+    def load_param(self):
         config = configparser.ConfigParser()
         if os.path.exists("saga.conf"):
             config_file = 'saga.conf'
@@ -28,6 +33,9 @@ class SagaClass:
         self.set_param('log_file', config.get('log', 'log_file'))
         self.set_param('error_file', config.get('log', 'error_file'))
         print("Class["+self.__class__.__name__+"]Configure file loaded.")
+
+    def build_logger(self):
+        self.logger = logger.create_logger(self.get_param('log_file'), self.get_param('error_file'))
 
     def set_param(self, key, value):
         self.params[key] = value
