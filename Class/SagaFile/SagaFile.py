@@ -1,5 +1,5 @@
 import os
-import Class.SagaClass as SagaClass
+from Class.SagaClass import SagaClass
 
 
 class SagaFile(SagaClass):
@@ -8,6 +8,7 @@ class SagaFile(SagaClass):
     __file_handler = None
 
     def __init__(self, file_path, file_name):
+        SagaClass.__init__(self)
         self.__file_path = file_path
         self.__file_name = file_name
         self.__file_name_raw, self.__file_name_ext = os.path.splitext(self.__file_name)
@@ -38,5 +39,5 @@ class SagaFile(SagaClass):
         return
 
     def process(self):
-        self.__file_handler.process(self.__file_handler, self)
+        self.__file_handler.process(self)
         return

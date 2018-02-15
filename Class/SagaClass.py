@@ -1,5 +1,33 @@
+import configparser
+import os
+
+
 class SagaClass:
-    params = None
+    params = {}
+
+    def __init__(self):
+        config = configparser.ConfigParser()
+        if os.path.exists("saga.conf"):
+            config_file = 'saga.conf'
+        elif os.path.exists("saga.conf.sample"):
+            config_file = "saga.conf.sample"
+        else:
+            print("FATAL ERROR: config file cannot find.")
+            exit(200)
+        config.read(config_file)
+        self.set_param('path_init', config.get('path', 'path_init'))
+        self.set_param('path_processed', config.get('path', 'path_processed'))
+        self.set_param('path_error', config.get('path', 'path_error'))
+        self.set_param('path_result', config.get('path', 'path_result'))
+        self.set_param('path_printed', config.get('path', 'path_printed'))
+        self.set_param('file_printed', config.get('path', 'file_printed'))
+        self.set_param('retry_interval', config.getfloat('interval', 'retry_interval'))
+        self.set_param('retry_seconds', config.getfloat('interval', 'retry_seconds'))
+        self.set_param('redis_ip', config.get('redis', 'redis_ip'))
+        self.set_param('redis_port', config.get('redis', 'redis_port'))
+        self.set_param('log_file', config.get('log', 'log_file'))
+        self.set_param('error_file', config.get('log', 'error_file'))
+        print("Class["+self.__class__.__name__+"]Configure file loaded.")
 
     def set_param(self, key, value):
         self.params[key] = value

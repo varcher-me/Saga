@@ -1,9 +1,10 @@
-import Class.SagaFile.SagaFile as SagaFile
-import Class.Handler.GdHandler as GdHandler
+from Class.SagaFile.SagaFile import SagaFile
+from Class.Handler.GdHandler import GdHandler
+from Class.SagaClass import SagaClass
 
-file = SagaFile.SagaFile('d:/temp/', 'hello.txt')
+file = SagaFile('D:/temp/init/', '关于开展2017年信息技术标准化工作检查的通知.gd')
 
-handler = GdHandler.GdHandler
+handler = GdHandler()
 
 file.set_handler(handler)
 file.process()
