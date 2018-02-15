@@ -52,9 +52,10 @@ class SagaFile(SagaClass):
         return
 
     def process(self):
-        # todo: 移入
+        # todo: 移入，检查
         self.__file_handler.process(self)
         self.file_process()
+        # todo：输出处理，统计
         return
 
     # 下面都是工具方法
