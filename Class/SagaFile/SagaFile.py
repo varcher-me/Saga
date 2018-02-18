@@ -2,6 +2,7 @@ import os
 import time
 import shutil
 from Class.SagaClass import SagaClass
+import filetype
 
 
 class SagaFile(SagaClass):
@@ -34,6 +35,11 @@ class SagaFile(SagaClass):
 
     def set_handler(self, handler):
         self.__file_handler = handler
+        self.__file_handler.set_file_obj(self)
+        return
+
+    def check_file_type(self):
+        self.__file_handler.check_file_type()
         return
 
     def file_process(self):
@@ -53,7 +59,8 @@ class SagaFile(SagaClass):
 
     def process(self):
         # todo: 移入，检查
-        self.__file_handler.process(self)
+        self.check_file_type()
+        self.__file_handler.process()
         self.file_process()
         # todo：输出处理，统计
         return
@@ -83,3 +90,10 @@ class SagaFile(SagaClass):
             else:
                 retry_time -= 1
         raise FileOperaException("Wait for file " + full_file + " appear timed out.")
+
+    def get_mime_type(self):
+        try:
+            kind = filetype.guess(self.__file_obj.get_path_name())
+        except Exception as e:
+            return None
+        return kind

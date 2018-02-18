@@ -6,6 +6,8 @@ import win32gui
 
 class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
     __hwnd = None
+    __file_obj = None
+    __file_type_in_handler = None
 
     def __init__(self):
         SagaClass.__init__(self)
@@ -18,22 +20,34 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
     def get_hwnd(self):
         return self.__hwnd
 
-    def process(self, file_obj):
-        self.open(file_obj)
-        self.pseudo_print(file_obj)
-        self.clean(file_obj)
+    def set_file_obj(self, file_obj):
+        self.__file_obj = file_obj
+        return
+
+    def get_file_obj(self):
+        return self.__file_obj
+
+    def process(self):
+        self.open()
+        self.pseudo_print()
+        self.clean()
         return
 
     @abc.abstractmethod
-    def open(self, file_obj):
+    def open(self):
         return
 
     @abc.abstractmethod
-    def pseudo_print(self, file_obj):
+    def pseudo_print(self):
         return
 
     @abc.abstractmethod
-    def clean(self, file_obj):
+    def clean(self):
+        return
+
+    def check_file_type(self):
+        if self.__file_obj.get_mime_type() != self.__file_type_in_handler:
+            exit(0)
         return
 
     def get_window(self, hwnd_father, hwnd_child_after, window_class, window_context):
@@ -65,3 +79,4 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
             else:
                 return True
         raise FileOperaException("Wait for window disappear timed out.")
+

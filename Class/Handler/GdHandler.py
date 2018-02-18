@@ -7,12 +7,13 @@ from Class.Handler.AbstractHandler import AbstractHandler
 class GdHandler(AbstractHandler):
     def __init__(self):
         AbstractHandler.__init__(self)
+        self.__file_type_in_handler = "gd"
         return
 
-    def open(self, file_obj):
-        file_path_name = file_obj.get_path_name()
-        file_path = file_obj.get_path()
-        file_name = file_obj.get_name()
+    def open(self):
+        file_path_name = self.get_file_obj().get_path_name()
+        file_path = self.get_file_obj().get_path()
+        file_name = self.get_file_obj().get_name()
         print("Starting processing " + file_path_name)
         win32api.ShellExecute(0, 'open', file_path + file_name, '', '', 1)
         hwnd = self.get_window(None, None, None, 'SEP Reader - [' + file_name + ']')
@@ -22,7 +23,7 @@ class GdHandler(AbstractHandler):
         #     exit(100)
         return
 
-    def pseudo_print(self, file_obj):
+    def pseudo_print(self):
         # 发送打印指令
         win32gui.SetForegroundWindow(self.get_hwnd())
         win32api.keybd_event(17, 0, 0, 0)  # Ctrl
@@ -40,7 +41,7 @@ class GdHandler(AbstractHandler):
             win32api.SendMessage(hwnd_printer, win32con.WM_CLOSE, 0, 0)
         return
 
-    def clean(self, file_obj):
+    def clean(self):
         # 窗口清理（SEP为关闭文件，保留程序窗口）
         win32gui.SetForegroundWindow(self.get_hwnd())
         win32api.keybd_event(17, 0, 0, 0)  # Ctrl
