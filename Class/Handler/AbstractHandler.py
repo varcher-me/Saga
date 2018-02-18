@@ -51,11 +51,14 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
         return
 
     def check_file_type(self):
-        if self.__file_obj.get_mime_type() != self.__file_type_in_handler:
-            raise FileTypeErrorException("File Type Error for File: [%s], %s is needed, but %s is given" % (
-                                         self.__file_obj.get_path_name(),
-                                         self.__file_type_in_handler,
-                                         self.__file_obj.get_mime_type()))
+        mime_type = self.__file_obj.get_mime_type()
+        if mime_type != self.__file_type_in_handler:
+            raise FileTypeErrorException("File Type Error for File: [%s], %s is needed, but %s is given"
+                                         % (
+                                             self.__file_obj.get_path_name(),
+                                             self.__file_type_in_handler,
+                                             mime_type
+                                         ))
         return
 
     def get_window(self, hwnd_father, hwnd_child_after, window_class, window_context):

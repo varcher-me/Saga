@@ -13,3 +13,8 @@ class FileOperaException(SagaException):
 
 class FileTypeErrorException(SagaException):
     pass
+
+
+class FileOpenFailedException(SagaException):
+    pass
+

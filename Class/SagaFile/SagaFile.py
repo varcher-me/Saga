@@ -38,11 +38,7 @@ class SagaFile(SagaClass):
         self.__file_handler.set_file_obj(self)
         return
 
-    def check_file_type(self):
-        self.__file_handler.check_file_type()
-        return
-
-    def file_process(self):
+    def file_move(self):
         path_printed = self.get_param('path_printed')  # PDF Creator创建的文件所在目录
         file_printed = self.get_param('file_printed')  # PDF Creator创建的文件名
         path_result = self.get_param('path_result')  # 打印后文件移动到的位置
@@ -59,9 +55,9 @@ class SagaFile(SagaClass):
 
     def process(self):
         # todo: 移入，检查
-        self.check_file_type()
+        self.__file_handler.check_file_type()
         self.__file_handler.process()
-        self.file_process()
+        self.file_move()
         # todo：输出处理，统计
         return
 
