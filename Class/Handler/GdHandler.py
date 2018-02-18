@@ -2,13 +2,16 @@ import win32api
 import win32gui
 import win32con
 from Class.Handler.AbstractHandler import AbstractHandler
-from Class.Exception.SagaException import FileOpenFailedException
+from Class.Exception.SagaException import FileOpenFailedException, FileOperaException
 
 
 class GdHandler(AbstractHandler):
     def __init__(self):
         AbstractHandler.__init__(self)
         self.set_file_type_in_handler("gd")
+        hwnd = self.get_window(None, None, None, 'SEP Reader', True)
+        if hwnd:
+            self.set_hwnd(hwnd)
         return
 
     def open(self):
@@ -17,7 +20,12 @@ class GdHandler(AbstractHandler):
         file_name = self.get_file_obj().get_name()
         print("Starting processing " + file_path_name)
         win32api.ShellExecute(0, 'open', file_path + file_name, '', '', 1)
-        hwnd, fail_hwnd = self.get_window_ex(None, None, None, 'SEP Reader - [' + file_name + ']', None, 'Reader')
+        hwnd = self.get_hwnd()
+        if hwnd:
+            fail_hwnd = self.get_window(None, None, None, 'Reader', True)
+        else:
+            hwnd, fail_hwnd = self.get_window_ex(None, None, None, 'SEP Reader - [' + file_name + ']', None,
+                                                 'Reader')
         if fail_hwnd:
             win32gui.SetForegroundWindow(fail_hwnd)
             win32api.keybd_event(13, 0, 0, 0)  # Enter
@@ -42,6 +50,8 @@ class GdHandler(AbstractHandler):
 
         # 等待打印窗体、按回车并判断窗体消失
         hwnd_printer = self.get_window(None, None, None, 'SEP Reader')
+        if hwnd_printer is None:
+            raise FileOperaException("Wait for SEP Reader Print Window timed out.")
         win32gui.SetForegroundWindow(hwnd_printer)
         win32api.keybd_event(13, 0, 0, 0)  # Enter
         win32api.keybd_event(13, 0, win32con.KEYEVENTF_KEYUP, 0)
