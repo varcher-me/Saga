@@ -51,6 +51,6 @@ class GdHandler(AbstractHandler):
         # win32api.SendMessage(hwnd_main, win32con.WM_CLOSE, 0, 0)
         return
 
-    def check_file_type(self):
-        # GD文件无法获取MIME特征，直接跳过检查
-        return
+    # def check_file_type(self):
+    #     # GD文件无法获取MIME特征，直接跳过检查
+    #     return
