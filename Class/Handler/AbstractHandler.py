@@ -1,4 +1,4 @@
-from Class.SagaClass import SagaClass
+from Class.SagaClass import *
 import abc
 import time
 import win32gui
@@ -65,16 +65,29 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
         retry_seconds = self.get_param('retry_seconds')
         retry_interval = self.get_param('retry_interval')
         retry_time = retry_seconds / retry_interval
-        hwnd = None
         while retry_time > 0:
             time.sleep(retry_interval)
             hwnd = win32gui.FindWindowEx(hwnd_father, hwnd_child_after, window_class, window_context)
             if hwnd:
-                break
+                return hwnd
             else:
                 retry_time -= 1
-        if hwnd:
-            return hwnd
+        raise FileOperaException("Wait for window appear timed out.")
+
+    def get_window_ex(self, hwnd_father, hwnd_child_after,
+                      window_class1, window_context1,
+                      window_class2, window_context2):
+        retry_seconds = self.get_param('retry_seconds')
+        retry_interval = self.get_param('retry_interval')
+        retry_time = retry_seconds / retry_interval
+        while retry_time > 0:
+            time.sleep(retry_interval)
+            hwnd1 = win32gui.FindWindowEx(hwnd_father, hwnd_child_after, window_class1, window_context1)
+            hwnd2 = win32gui.FindWindowEx(hwnd_father, hwnd_child_after, window_class2, window_context2)
+            if hwnd1 or hwnd2:
+                return hwnd1, hwnd2
+            else:
+                retry_time -= 1
         else:
             raise FileOperaException("Wait for window appear timed out.")
 

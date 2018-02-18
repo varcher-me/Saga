@@ -2,6 +2,7 @@ import win32api
 import win32gui
 import win32con
 from Class.Handler.AbstractHandler import AbstractHandler
+from Class.Exception.SagaException import FileOpenFailedException
 
 
 class GdHandler(AbstractHandler):
@@ -16,7 +17,15 @@ class GdHandler(AbstractHandler):
         file_name = self.get_file_obj().get_name()
         print("Starting processing " + file_path_name)
         win32api.ShellExecute(0, 'open', file_path + file_name, '', '', 1)
-        hwnd = self.get_window(None, None, None, 'SEP Reader - [' + file_name + ']')
+        hwnd, fail_hwnd = self.get_window_ex(None, None, None, 'SEP Reader - [' + file_name + ']', None, 'Reader')
+        if fail_hwnd:
+            win32gui.SetForegroundWindow(fail_hwnd)
+            win32api.keybd_event(13, 0, 0, 0)  # Enter
+            win32api.keybd_event(13, 0, win32con.KEYEVENTF_KEYUP, 0)
+            if not self.wait_window_disappear(fail_hwnd):
+                # logger.error("File [" + raw_file + "] print-window-disappear timed out; WM_CLOSE signal sent.")
+                win32api.SendMessage(fail_hwnd, win32con.WM_CLOSE, 0, 0)
+            raise FileOpenFailedException("File %s Open Failed." % (self.get_file_obj().get_path_name()))
         self.set_hwnd(hwnd)
         # if 0 == hwnd_main_sep:
         #     # logger.fatal("FATAL ERROR: SEP Reader Window not found! program terminated.")
