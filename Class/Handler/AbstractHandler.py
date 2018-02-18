@@ -2,6 +2,7 @@ from Class.SagaClass import SagaClass
 import abc
 import time
 import win32gui
+from Class.Exception.SagaException import *
 
 
 class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
@@ -27,6 +28,10 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
     def get_file_obj(self):
         return self.__file_obj
 
+    def set_file_type_in_handler(self, file_type_in_handler):
+        self.__file_type_in_handler = file_type_in_handler
+        return
+
     def process(self):
         self.open()
         self.pseudo_print()
@@ -47,7 +52,10 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
 
     def check_file_type(self):
         if self.__file_obj.get_mime_type() != self.__file_type_in_handler:
-            exit(0)
+            raise FileTypeErrorException("File Type Error for File: [%s], %s is needed, but %s is given" % (
+                                         self.__file_obj.get_path_name(),
+                                         self.__file_type_in_handler,
+                                         self.__file_obj.get_mime_type()))
         return
 
     def get_window(self, hwnd_father, hwnd_child_after, window_class, window_context):

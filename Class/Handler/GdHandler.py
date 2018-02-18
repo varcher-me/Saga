@@ -7,7 +7,7 @@ from Class.Handler.AbstractHandler import AbstractHandler
 class GdHandler(AbstractHandler):
     def __init__(self):
         AbstractHandler.__init__(self)
-        self.__file_type_in_handler = "gd"
+        self.set_file_type_in_handler("gd")
         return
 
     def open(self):
@@ -49,4 +49,8 @@ class GdHandler(AbstractHandler):
         win32api.keybd_event(17, 0, win32con.KEYEVENTF_KEYUP, 0)
         win32api.keybd_event(87, 0, win32con.KEYEVENTF_KEYUP, 0)
         # win32api.SendMessage(hwnd_main, win32con.WM_CLOSE, 0, 0)
+        return
+
+    def check_file_type(self):
+        # GD文件无法获取MIME特征，直接跳过检查
         return
