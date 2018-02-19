@@ -3,7 +3,7 @@ import logging.handlers
 import traceback
 
 
-def create_logger(log_file, error_file):
+def create_logger(log_file, error_file, log_level):
     handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=1024 * 1024, backupCount=5)  # 实例化handler
     handler_error = logging.handlers.RotatingFileHandler(error_file, maxBytes=1024 * 1024, backupCount=5)  # 实例化handler
     handler_error.setLevel(logging.ERROR)
@@ -14,5 +14,5 @@ def create_logger(log_file, error_file):
     logger = logging.getLogger('tst')  # 获取名为tst的logger
     logger.addHandler(handler)  # 为logger添加handler
     logger.addHandler(handler_error)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(log_level)
     return logger

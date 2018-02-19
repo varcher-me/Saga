@@ -10,6 +10,7 @@ file_printed = PrintedPDF.pdf
 retry_interval = 0.5
 retry_seconds = 10
 sleep_interval = 1
+heart_interval = 60
 
 [redis]
 redis_ip = 127.0.0.1
@@ -19,3 +20,4 @@ redis_token = ""
 [log]
 log_file = d:\temp\process.log
 error_file = d:\temp\error.log
+log_level = DEBUG
