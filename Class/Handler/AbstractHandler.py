@@ -91,8 +91,7 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
                 return hwnd1, hwnd2
             else:
                 retry_time -= 1
-        else:
-            raise FileOperaException("Wait for window appear timed out.")
+        raise WaitWindowTimeOutException("Wait for window appear timed out.")
 
     def wait_window_disappear(self, window_hwnd):
         retry_seconds = self.get_param('retry_seconds')
@@ -105,5 +104,5 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
                 retry_time -= 1
             else:
                 return True
-        raise FileOperaException("Wait for window disappear timed out.")
+        raise WaitWindowDisappearTimeOutException("Wait for window disappear timed out.")
 

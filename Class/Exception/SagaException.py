@@ -18,3 +18,18 @@ class FileTypeErrorException(SagaException):
 class FileOpenFailedException(SagaException):
     pass
 
+
+class WaitWindowTimeOutException(SagaException):
+    pass
+
+
+class WaitWindowDisappearTimeOutException(SagaException):
+    pass
+
+
+class FileMoveFailedException(SagaException):
+    pass
+
+
+class WaitFileTimeOutException(SagaException):
+    pass

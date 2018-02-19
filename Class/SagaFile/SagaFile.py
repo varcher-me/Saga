@@ -49,13 +49,17 @@ class SagaFile(SagaClass):
         # 移动文件
         try:
             self.move_file(printed_pathname, moved_file)
+        except WaitFileTimeOutException as e:
+            self.logger.fatal(str(e))
+            raise e
         except Exception as e:
-            self.logger.fatal("FATAL ERROR: move file failed, exception is " + str(e) + ", process terminated.")
-            exit(101)
+            exception_str = "FATAL ERROR: move file failed, exception is " + str(e) + ", process terminated."
+            self.logger.fatal(exception_str)
+            raise FileMoveFailedException(exception_str)
         return
 
     def process(self):
-        # todo: 移入，检查
+        # todo: 移入
         self.__file_handler.check_file_type()
         self.__file_handler.process()
         self.file_move()
@@ -86,7 +90,7 @@ class SagaFile(SagaClass):
                     retry_time -= 1
             else:
                 retry_time -= 1
-        raise FileOperaException("Wait for file " + full_file + " appear timed out.")
+        raise WaitFileTimeOutException("Wait for file " + full_file + " appear timed out.")
 
     def get_mime_type(self):
         try:
