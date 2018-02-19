@@ -9,9 +9,9 @@ class GdHandler(AbstractHandler):
     def __init__(self):
         AbstractHandler.__init__(self)
         self.set_file_type_in_handler("gd")
-        hwnd = self.get_window(None, None, None, 'SEP Reader', True)
-        if hwnd:
-            self.set_hwnd(hwnd)
+        # hwnd = self.get_window(None, None, None, 'SEP Reader', True)
+        # if hwnd:
+        #     self.set_hwnd(hwnd)
         return
 
     def open(self):
@@ -24,8 +24,11 @@ class GdHandler(AbstractHandler):
         # if hwnd:
         #     fail_hwnd = self.get_window(None, None, None, 'Reader', True)
         # else:
-        hwnd, fail_hwnd = self.get_window_ex(None, None, None, 'SEP Reader - [' + file_name + ']', None,
-                                             'Reader')
+        try:
+            hwnd, fail_hwnd = self.get_window_ex(None, None, None, 'SEP Reader - [' + file_name + ']', None,
+                                                'Reader')
+        except WaitWindowTimeOutException as e:
+            raise FileOperaException("Wait for SEP Reader window timed out")
         if fail_hwnd:
             win32gui.SetForegroundWindow(fail_hwnd)
             win32api.keybd_event(13, 0, 0, 0)  # Enter
@@ -51,9 +54,10 @@ class GdHandler(AbstractHandler):
         win32api.keybd_event(80, 0, win32con.KEYEVENTF_KEYUP, 0)
 
         # 等待打印窗体、按回车并判断窗体消失
-        hwnd_printer = self.get_window(None, None, None, 'SEP Reader')
-        if hwnd_printer is None:
-            raise FileOperaException("Wait for SEP Reader Print Window timed out.")
+        try:
+            hwnd_printer = self.get_window(None, None, None, 'SEP Reader')
+        except WaitWindowTimeOutException as e:
+            raise FileOperaException("Wait for printer window timed out.")
         win32gui.SetForegroundWindow(hwnd_printer)
         win32api.keybd_event(13, 0, 0, 0)  # Enter
         win32api.keybd_event(13, 0, win32con.KEYEVENTF_KEYUP, 0)

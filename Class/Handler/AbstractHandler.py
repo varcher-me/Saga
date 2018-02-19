@@ -2,6 +2,8 @@ from Class.SagaClass import *
 import abc
 import time
 import win32gui
+import win32api
+import win32con
 from Class.Exception.SagaException import *
 
 
@@ -15,7 +17,7 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
         return
 
     def set_hwnd(self, hwnd):
-        self.__hwnd = hwnd;
+        self.__hwnd = hwnd
         return
 
     def get_hwnd(self):
@@ -33,9 +35,13 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
         return
 
     def process(self):
-        self.open()
-        self.pseudo_print()
-        self.clean()
+        try:
+            self.open()
+            self.pseudo_print()
+            self.clean()
+        except Exception as e:
+            self.force_clean()
+            raise e
         return
 
     @abc.abstractmethod
@@ -75,7 +81,7 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
                 return hwnd
             else:
                 retry_time -= 1
-        return None
+        raise WaitWindowTimeOutException("Wait for window appear timed out.")
 
     def get_window_ex(self, hwnd_father, hwnd_child_after,
                       window_class1, window_context1,
@@ -106,3 +112,6 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
                 return True
         raise WaitWindowDisappearTimeOutException("Wait for window disappear timed out.")
 
+    def force_clean(self):
+        win32api.SendMessage(self.get_hwnd(), win32con.WM_CLOSE, 0, 0)
+        return

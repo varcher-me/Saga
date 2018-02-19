@@ -60,11 +60,26 @@ class SagaFile(SagaClass):
 
     def process(self):
         # todo: 移入
-        self.__file_handler.check_file_type()
-        self.__file_handler.process()
-        self.file_move()
+        try:
+            self.__file_handler.check_file_type()
+            self.__file_handler.process()
+            self.file_move()
+        except FileTypeErrorException as e:
+            self.finalize(False, "FILE_TYPE_CHECK", str(e))
+        except (FileOpenFailedException, FileOperaException) as e:
+            self.finalize(False, "FILE_PROCESS", str(e))
+        except (WaitFileTimeOutException, FileMoveFailedException) as e:
+            self.finalize(False, "FILE_FINAL_MOVE", str(e))
         # todo：输出处理，统计
         return
+
+    def finalize(self, is_success=True, status_string=None, status_comment=None):
+        if is_success:
+            pass
+        else:
+            print(status_string)
+            print(status_comment)
+        pass
 
     # 下面都是工具方法
     def move_file(self, origin_file, new_file):

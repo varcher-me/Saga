@@ -9,6 +9,7 @@ class SagaClass:
 
     def __init__(self):
         self.load_param()
+        self.build_logger()
 
     def load_param(self):
         config = configparser.ConfigParser()
@@ -36,6 +37,7 @@ class SagaClass:
 
     def build_logger(self):
         self.logger = logger.create_logger(self.get_param('log_file'), self.get_param('error_file'))
+        print("Class["+self.__class__.__name__+"]logger loaded.")
 
     def set_param(self, key, value):
         self.params[key] = value
