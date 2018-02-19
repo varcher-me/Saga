@@ -109,7 +109,7 @@ class SagaFile(SagaClass):
 
     def get_mime_type(self):
         try:
-            kind = filetype.guess(self.__file_obj.get_path_name())
-        except Exception as e:
+            kind = filetype.guess(self.get_path_name())
+        except Exception:
             return None
         return kind
