@@ -15,7 +15,19 @@ class FileTypeErrorException(SagaException):
     pass
 
 
+class FileExtUnknownException(SagaException):
+    pass
+
+
 class FileOpenFailedException(SagaException):
+    pass
+
+
+class FileMoveFailedException(SagaException):
+    pass
+
+
+class WaitFileTimeOutException(SagaException):
     pass
 
 
@@ -26,10 +38,3 @@ class WaitWindowTimeOutException(SagaException):
 class WaitWindowDisappearTimeOutException(SagaException):
     pass
 
-
-class FileMoveFailedException(SagaException):
-    pass
-
-
-class WaitFileTimeOutException(SagaException):
-    pass

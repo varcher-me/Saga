@@ -39,6 +39,9 @@ class SagaClass:
         self.logger = logger.create_logger(self.get_param('log_file'), self.get_param('error_file'))
         print("Class["+self.__class__.__name__+"]logger loaded.")
 
+    def get_logger(self):
+        return self.logger
+
     def set_param(self, key, value):
         self.params[key] = value
 

@@ -39,7 +39,7 @@ class SagaFile(SagaClass):
         self.__file_handler.set_file_obj(self)
         return
 
-    def file_move(self):
+    def output_file_move(self):
         path_printed = self.get_param('path_printed')  # PDF Creator创建的文件所在目录
         file_printed = self.get_param('file_printed')  # PDF Creator创建的文件名
         path_result = self.get_param('path_result')  # 打印后文件移动到的位置
@@ -58,12 +58,29 @@ class SagaFile(SagaClass):
             raise FileMoveFailedException(exception_str)
         return
 
+    def initial_file_move(self):
+        path_init = self.get_param("path_init")
+        path_processed = self.get_param("path_processed")
+        file_init = os.path.join(path_init, self.get_name())
+        # 移动文件
+        try:
+            self.move_file(file_init, path_processed)
+        except WaitFileTimeOutException as e:
+            self.logger.fatal(str(e))
+            raise e
+        except Exception as e:
+            exception_str = "FATAL ERROR: move file failed, exception is " + str(e) + ", process terminated."
+            self.logger.fatal(exception_str)
+            raise FileMoveFailedException(exception_str)
+        return
+
     def process(self):
         # todo: 移入
         try:
             self.__file_handler.check_file_type()
             self.__file_handler.process()
-            self.file_move()
+            self.output_file_move()
+            self.initial_file_move()
         except FileTypeErrorException as e:
             self.finalize(False, "FILE_TYPE_CHECK", str(e))
         except (FileOpenFailedException, FileOperaException) as e:
@@ -87,7 +104,7 @@ class SagaFile(SagaClass):
         if os.path.isfile(new_file):
             os.remove(new_file)
         shutil.move(origin_file, new_file)
-        print("File " + new_file + " moved.")
+        print("File %s moved to %s ." % (origin_file, new_file))
 
     def wait_for_file(self, full_file):
         retry_seconds = self.get_param('retry_seconds')
