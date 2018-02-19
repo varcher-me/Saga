@@ -17,6 +17,7 @@ class SagaKeeper(SagaClass):
 
     def do(self):
         path_init = self.get_param("path_init")
+        sleep_interval = self.get_param("sleep_interval")
         while True:
             for i in os.walk(path_init):
                 for fileName in i[2]:
@@ -33,5 +34,5 @@ class SagaKeeper(SagaClass):
                         except_string = "FATAL ERROR: something error, exception is >>>" + str(e) + "<<<."
                         print(except_string)
                         self.get_logger().fatal(except_string)
-            print("Process finished or no file, sleep 10 seconds.")
-            time.sleep(10)
+            print("Process finished or no file, sleep %d seconds." % sleep_interval)
+            time.sleep(sleep_interval)
