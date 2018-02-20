@@ -2,10 +2,8 @@ from Class.SagaFile.SagaFile import SagaFile
 from Class.Handler.GdHandler import GdHandler
 from Class.Exception.SagaException import *
 from Class.SagaClass import SagaClass
-import redis
 import time
 import os
-import shutil
 
 
 class SagaKeeper(SagaClass):
