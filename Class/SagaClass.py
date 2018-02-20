@@ -1,11 +1,13 @@
 import configparser
 import os
 import logger
+import redis
 
 
 class SagaClass:
     params = {}
     logger = None
+    redisConnection = None
 
     def __init__(self):
         self.load_param()
@@ -34,7 +36,8 @@ class SagaClass:
         self.set_param('heart_interval', config.getint('interval', 'heart_interval'))
 
         self.set_param('redis_ip', config.get('redis', 'redis_ip'))
-        self.set_param('redis_port', config.get('redis', 'redis_port'))
+        self.set_param('redis_port', config.getint('redis', 'redis_port'))
+        self.set_param('redis_db', config.getint('redis', 'redis_db'))
         self.set_param('redis_token', config.get('redis', 'redis_token'))
 
         self.set_param('log_file', config.get('log', 'log_file'))
@@ -57,3 +60,17 @@ class SagaClass:
             return self.params[key]
         except Exception as e:
             return None
+
+    def redis_setup(self):
+        redis_host = self.get_param('redis_ip')
+        redis_port = self.get_param('redis_port')
+        redis_db = self.get_param('redis_db')
+        self.redisConnection = redis.Redis(host=redis_host, port=redis_port, db=redis_db, decode_responses=True)
+
+    def redis_set(self, key, value, ex):
+        if self.redisConnection is None:
+            self.redis_setup()
+        self.redisConnection.set(key, value, ex)
+
+    def redis_get(self, key):
+        return self.redisConnection.get(key)

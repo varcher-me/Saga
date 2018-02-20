@@ -9,12 +9,13 @@ file_printed = PrintedPDF.pdf
 [interval]
 retry_interval = 0.5
 retry_seconds = 10
-sleep_interval = 1
+sleep_interval = 5
 heart_interval = 60
 
 [redis]
 redis_ip = 127.0.0.1
 redis_port = 6379
+redis_db = 2
 redis_token = ""
 
 [log]
