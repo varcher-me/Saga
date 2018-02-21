@@ -31,7 +31,12 @@ def secure_filename(filename):
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
     if request.method == 'POST':
+        print("AAA")
+        print(request)
+        print(request.files['file'])
+        print("BBB")
         f = request.files['file']
+        print(f.filename)
         upload_path = os.path.join('d:/temp/init/', secure_filename(f.filename))  # 注意：没有的文件夹一定要先创建，不然会提示没有该路径
         f.save(upload_path)
         return redirect(url_for('upload'))
@@ -39,4 +44,4 @@ def upload():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)

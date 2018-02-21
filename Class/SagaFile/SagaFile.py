@@ -58,13 +58,19 @@ class SagaFile(SagaClass):
             raise FileMoveFailedException(exception_str)
         return
 
-    def initial_file_move(self):
+    def initial_file_move(self, is_success=True):
         path_init = self.get_param("path_init")
-        path_processed = self.get_param("path_processed")
+        if is_success:
+            path_finish = self.get_param("path_processed")
+        else:
+            path_finish = self.get_param("path_error")
         file_init = os.path.join(path_init, self.get_name())
+        file_moved = os.path.join(path_finish, self.get_name())
+        if os.path.isfile(file_moved):
+            os.remove(file_moved)
         # 移动文件
         try:
-            self.move_file(file_init, path_processed)
+            self.move_file(file_init, file_moved)
         except WaitFileTimeOutException as e:
             self.logger.fatal(str(e))
             raise e
@@ -80,7 +86,6 @@ class SagaFile(SagaClass):
             self.__file_handler.check_file_type()
             self.__file_handler.process()
             self.output_file_move()
-            self.initial_file_move()
         except FileTypeErrorException as e:
             self.finalize(False, "FILE_TYPE_CHECK", str(e))
         except (FileOpenFailedException, FileOperaException) as e:
@@ -91,12 +96,19 @@ class SagaFile(SagaClass):
         return
 
     def finalize(self, is_success=True, status_string=None, status_comment=None):
-        if is_success:
-            pass
-        else:
-            print(status_string)
-            print(status_comment)
-        pass
+        try:
+            if is_success:
+                self.initial_file_move(True)
+            else:
+                self.initial_file_move(False)
+                print(status_string)
+                print(status_comment)
+        except (WaitFileTimeOutException, FileMoveFailedException) as e:
+            self.get_logger().error("Initial File move failed for %s (reason: %s), Need processed manually."
+                                    % (self.get_path_name(), str(e)))
+        except Exception as e:
+            self.get_logger().error("Finalize for %s (reason: %s) failed, Need processed manually."
+                                    % (self.get_path_name(), str(e)))
 
     # 下面都是工具方法
     def move_file(self, origin_file, new_file):
