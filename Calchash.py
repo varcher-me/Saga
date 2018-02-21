@@ -1,5 +1,6 @@
 import hashlib
 
+
 def calc_sha1(filepath):
     try:
         with open(filepath, 'rb') as f:

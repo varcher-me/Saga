@@ -1,6 +1,7 @@
 import os
 import time
 import shutil
+import Calchash
 from Class.SagaClass import SagaClass
 from Class.Exception.SagaException import *
 import filetype
@@ -9,7 +10,10 @@ import filetype
 class SagaFile(SagaClass):
     __file_path = ''
     __file_name = ''
+    __file_sha1 = ''
+    __file_md5 = ''
     __file_handler = None
+    __mysql = None
 
     def __init__(self, file_path, file_name):
         SagaClass.__init__(self)
@@ -39,6 +43,16 @@ class SagaFile(SagaClass):
         self.__file_handler.set_file_obj(self)
         return
 
+    def set_mysql(self, mysql):
+        self.__mysql = mysql
+
+    def calc_hash(self):
+        if os.path.isfile(self.get_path_name()):
+            self.__file_sha1 = Calchash.calc_sha1(self.get_path_name())
+            self.__file_md5 = Calchash.calc_md5(self.get_path_name())
+        else:
+            raise FileNotFoundError("File %s not found.")
+
     def output_file_move(self):
         path_printed = self.get_param('path_printed')  # PDF Creator创建的文件所在目录
         file_printed = self.get_param('file_printed')  # PDF Creator创建的文件名
@@ -66,6 +80,7 @@ class SagaFile(SagaClass):
             path_finish = self.get_param("path_error")
         file_init = os.path.join(path_init, self.get_name())
         file_moved = os.path.join(path_finish, self.get_name())
+        print("FILE MOVED = " + file_moved)
         if os.path.isfile(file_moved):
             os.remove(file_moved)
         # 移动文件
@@ -81,8 +96,8 @@ class SagaFile(SagaClass):
         return
 
     def process(self):
-        # todo: 移入
         try:
+            self.calc_hash()
             self.__file_handler.check_file_type()
             self.__file_handler.process()
             self.output_file_move()
@@ -92,10 +107,13 @@ class SagaFile(SagaClass):
             self.finalize(False, "FILE_PROCESS", str(e))
         except (WaitFileTimeOutException, FileMoveFailedException) as e:
             self.finalize(False, "FILE_FINAL_MOVE", str(e))
+        except Exception as e:
+            self.finalize(False, "UNKNOWN", str(e))
+        self.finalize(True)
         # todo：输出处理，统计
         return
 
-    def finalize(self, is_success=True, status_string=None, status_comment=None):
+    def finalize(self, is_success=True, status_string=None, status_comment=None):   # todo 失败情况，增加重试次数
         try:
             if is_success:
                 self.initial_file_move(True)

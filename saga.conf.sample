@@ -18,6 +18,13 @@ redis_port = 6379
 redis_db = 2
 redis_token = ""
 
+[mysql]
+mysql_ip = 127.0.0.1
+mysql_port = 3306
+mysql_user = root
+mysql_pass = rootPASSWORD123$%^
+mysql_db = Saga
+
 [log]
 log_file = d:\temp\process.log
 error_file = d:\temp\error.log

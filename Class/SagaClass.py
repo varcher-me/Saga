@@ -40,6 +40,12 @@ class SagaClass:
         self.set_param('redis_db', config.getint('redis', 'redis_db'))
         self.set_param('redis_token', config.get('redis', 'redis_token'))
 
+        self.set_param('mysql_ip', config.get('mysql', 'mysql_ip'))
+        self.set_param('mysql_port', config.getint('mysql', 'mysql_port'))
+        self.set_param('mysql_user', config.get('mysql', 'mysql_user'))
+        self.set_param('mysql_pass', config.get('mysql', 'mysql_pass', raw=True))
+        self.set_param('mysql_db', config.get('mysql', 'mysql_db'))
+
         self.set_param('log_file', config.get('log', 'log_file'))
         self.set_param('error_file', config.get('log', 'error_file'))
         self.set_param('log_level', config.get('log', 'log_level'))
