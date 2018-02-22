@@ -118,8 +118,8 @@ class SagaFile(SagaClass):
             self.finalize(False, "FILE_PROCESS", str(e))
         except (WaitFileTimeOutException, FileMoveFailedException) as e:
             self.finalize(False, "FILE_FINAL_MOVE", str(e))
-        # except Exception as e:  todo
-        #     self.finalize(False, "UNKNOWN", str(e))
+        except Exception as e:
+            self.finalize(False, "UNKNOWN", str(e))
         self.finalize(True)
         # todo：输出处理，统计
         return
@@ -127,11 +127,11 @@ class SagaFile(SagaClass):
     def finalize(self, is_success=True, status_string=None, status_comment=None):   # todo 失败情况，增加重试次数
         try:
             if is_success:
-                # self.initial_file_move(True)  todo: reopen
+                self.initial_file_move(True)
                 self.__mysql.commit()
                 pass
             else:
-                # self.initial_file_move(False)  todo: reopen
+                self.initial_file_move(False)
                 print(status_string)
                 print(status_comment)
         except (WaitFileTimeOutException, FileMoveFailedException) as e:
