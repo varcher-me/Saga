@@ -38,7 +38,7 @@ class SagaClass:
         self.set_param('redis_ip', config.get('redis', 'redis_ip'))
         self.set_param('redis_port', config.getint('redis', 'redis_port'))
         self.set_param('redis_db', config.getint('redis', 'redis_db'))
-        self.set_param('redis_token', config.get('redis', 'redis_token'))
+        self.set_param('redis_token', config.get('redis', 'redis_token', raw=True))
 
         self.set_param('mysql_ip', config.get('mysql', 'mysql_ip'))
         self.set_param('mysql_port', config.getint('mysql', 'mysql_port'))
@@ -71,7 +71,12 @@ class SagaClass:
         redis_host = self.get_param('redis_ip')
         redis_port = self.get_param('redis_port')
         redis_db = self.get_param('redis_db')
-        self.redisConnection = redis.Redis(host=redis_host, port=redis_port, db=redis_db, decode_responses=True)
+        redis_token = self.get_param('redis_token')
+        self.redisConnection = redis.Redis(host=redis_host,
+                                           port=redis_port,
+                                           db=redis_db,
+                                           password=redis_token,
+                                           decode_responses=True)
 
     def redis_set(self, key, value, ex):
         if self.redisConnection is None:
