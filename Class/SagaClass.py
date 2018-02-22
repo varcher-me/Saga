@@ -67,7 +67,7 @@ class SagaClass:
         except Exception as e:
             return None
 
-    def redis_setup(self):
+    def redis_setup(self):      # todo redis链接后续建立connector
         redis_host = self.get_param('redis_ip')
         redis_port = self.get_param('redis_port')
         redis_db = self.get_param('redis_db')
@@ -75,7 +75,7 @@ class SagaClass:
         self.redisConnection = redis.Redis(host=redis_host,
                                            port=redis_port,
                                            db=redis_db,
-                                           password=redis_token,
+                                           # password=redis_token,
                                            decode_responses=True)
 
     def redis_set(self, key, value, ex):

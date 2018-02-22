@@ -10,8 +10,8 @@ import filetype
 class SagaFile(SagaClass):
     __file_path = ''
     __file_name = ''
-    __file_sha1 = ''
-    __file_md5 = ''
+    __file_seq_no = 0
+    __cache_status = False
     __file_handler = None
     __mysql = None
 
@@ -46,12 +46,20 @@ class SagaFile(SagaClass):
     def set_mysql(self, mysql):
         self.__mysql = mysql
 
-    def calc_hash(self):
+    def search_insert_file(self):
         if os.path.isfile(self.get_path_name()):
-            self.__file_sha1 = Calchash.calc_sha1(self.get_path_name())
-            self.__file_md5 = Calchash.calc_md5(self.get_path_name())
+            file_sha1 = Calchash.calc_sha1(self.get_path_name())
+            file_md5 = Calchash.calc_md5(self.get_path_name())
+            file_size = os.path.getsize(self.get_path_name())
         else:
             raise FileNotFoundError("File %s not found.")
+        file_seq_no, cache_status = self.__mysql.search_file(self.get_name(),
+                                                             self.get_file_ext(),
+                                                             file_size,
+                                                             file_sha1,
+                                                             file_md5)
+        self.__file_seq_no = file_seq_no
+        self.__cache_status = cache_status
 
     def output_file_move(self):
         path_printed = self.get_param('path_printed')  # PDF Creator创建的文件所在目录
@@ -97,18 +105,21 @@ class SagaFile(SagaClass):
 
     def process(self):
         try:
-            self.calc_hash()
-            self.__file_handler.check_file_type()
-            self.__file_handler.process()
-            self.output_file_move()
+            self.search_insert_file()
+            if self.__cache_status is False:
+                self.__file_handler.check_file_type()
+                self.__file_handler.process()
+                self.output_file_move()
+            else:
+                print("File %s hitted in cache, file seq = %d ." % (self.get_name(), self.__file_seq_no))
         except FileTypeErrorException as e:
             self.finalize(False, "FILE_TYPE_CHECK", str(e))
         except (FileOpenFailedException, FileOperaException) as e:
             self.finalize(False, "FILE_PROCESS", str(e))
         except (WaitFileTimeOutException, FileMoveFailedException) as e:
             self.finalize(False, "FILE_FINAL_MOVE", str(e))
-        except Exception as e:
-            self.finalize(False, "UNKNOWN", str(e))
+        # except Exception as e:  todo
+        #     self.finalize(False, "UNKNOWN", str(e))
         self.finalize(True)
         # todo：输出处理，统计
         return
@@ -116,9 +127,11 @@ class SagaFile(SagaClass):
     def finalize(self, is_success=True, status_string=None, status_comment=None):   # todo 失败情况，增加重试次数
         try:
             if is_success:
-                self.initial_file_move(True)
+                # self.initial_file_move(True)  todo: reopen
+                self.__mysql.commit()
+                pass
             else:
-                self.initial_file_move(False)
+                # self.initial_file_move(False)  todo: reopen
                 print(status_string)
                 print(status_comment)
         except (WaitFileTimeOutException, FileMoveFailedException) as e:

@@ -51,6 +51,7 @@ class SagaKeeper(SagaClass):
                         except_string = "FATAL ERROR: something error, exception is >>>" + str(e) + "<<<."
                         print(except_string)
                         self.get_logger().fatal(except_string)
+                        raise e
 
             self.heart_beat()
             print("Process finished or no file, sleep %d seconds." % sleep_interval)
