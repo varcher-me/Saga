@@ -93,7 +93,7 @@ class SagaFile(SagaClass):
             os.remove(file_moved)
         # 移动文件
         try:
-            self.move_file(file_init, file_moved)
+            self.move_file(file_init, file_moved, no_wait=True)
         except WaitFileTimeOutException as e:
             self.logger.fatal(str(e))
             raise e
@@ -140,8 +140,9 @@ class SagaFile(SagaClass):
                                     % (self.get_path_name(), str(e)))
 
     # 下面都是工具方法
-    def move_file(self, origin_file, new_file):
-        self.wait_for_file(origin_file)
+    def move_file(self, origin_file, new_file, no_wait=False):
+        if no_wait is False:
+            self.wait_for_file(origin_file)
         if os.path.isfile(new_file):
             os.remove(new_file)
         shutil.move(origin_file, new_file)

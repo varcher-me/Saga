@@ -1,5 +1,10 @@
 from Class.SagaKeeper import SagaKeeper
 
 
-sagaKeeper = SagaKeeper()
-sagaKeeper.do()
+def main():
+    saga_keeper = SagaKeeper()
+    saga_keeper.do()
+
+
+if __name__ == '__main__':
+    main()

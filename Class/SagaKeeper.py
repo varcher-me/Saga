@@ -2,6 +2,7 @@ from Class.SagaFile.SagaFile import SagaFile
 from Class.Handler.GdHandler import GdHandler
 from Class.Handler.WordHandler import WordHandler
 from Class.Connector.MySQLConnector import MySQLConnector
+from Class.Configure.Configure import Configure
 from Class.Exception.SagaException import *
 from Class.SagaClass import SagaClass
 import time
@@ -10,7 +11,9 @@ import os
 
 class SagaKeeper(SagaClass):
     __gdHandler = None
+    __wordHandler = None
     __mysql = None
+    __configure = None
     __lastHeartTime = 0
     __heartInterval = 0
 
@@ -21,6 +24,7 @@ class SagaKeeper(SagaClass):
         self.__wordHandler = WordHandler()
         self.__mysql = MySQLConnector()
         self.__mysql.conn()
+        self.__configure = Configure()
         return
 
     def heart_beat(self):
@@ -50,6 +54,8 @@ class SagaKeeper(SagaClass):
                             except_string = "Unknown ext for file: %s" % (file.get_path_name())
                             raise FileExtUnknownException(except_string)
                         file.set_mysql(self.__mysql)
+                        # file.set_configure(self.__configure)
+                        # file.build_logger()
                         file.process()
                     except Exception as e:
                         except_string = "FATAL ERROR: something error, exception is >>>" + str(e) + "<<<."
