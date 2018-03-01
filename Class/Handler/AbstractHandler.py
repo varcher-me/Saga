@@ -56,16 +56,16 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
     def clean(self):
         return
 
-    def check_file_type(self):
-        mime_type = self.__file_obj.get_mime_type()
-        if mime_type != self.__file_type_in_handler:
-            raise FileTypeErrorException("File Type Error for File: [%s], %s is needed, but %s is given"
-                                         % (
-                                             self.__file_obj.get_path_name(),
-                                             self.__file_type_in_handler,
-                                             mime_type
-                                         ))
-        return
+    # def check_file_type(self):
+    #     mime_type = self.__file_obj.get_mime_type()
+    #     if mime_type != self.__file_type_in_handler:
+    #         raise FileTypeErrorException("File Type Error for File: [%s], %s is needed, but %s is given"
+    #                                      % (
+    #                                          self.__file_obj.get_path_name(),
+    #                                          self.__file_type_in_handler,
+    #                                          mime_type
+    #                                      ))
+    #     return
 
     def get_window(self, hwnd_father, hwnd_child_after, window_class, window_context, no_wait=False):
         retry_interval = self.get_param('retry_interval')

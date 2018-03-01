@@ -1,3 +1,6 @@
+[environment]
+env = debug
+
 [path]
 path_init = d:\temp\init\
 path_processed = d:\temp\processed\
@@ -13,17 +16,17 @@ sleep_interval = 5
 heart_interval = 60
 
 [redis]
-redis_ip = 127.0.0.1
+redis_ip = 10.5.10.128
 redis_port = 6379
 redis_db = 2
-redis_token = ""
+redis_token = JG^Pglfk9nC7$9hS
 
 [mysql]
-mysql_ip = 127.0.0.1
+mysql_ip = 10.5.10.128
 mysql_port = 3306
-mysql_user = root
-mysql_pass = rootPASSWORD123$%^
-mysql_db = Saga
+mysql_user = saga
+mysql_pass = VZTy32Pjw3bhx4fA!
+mysql_db = saga
 
 [log]
 log_file = d:\temp\process.log

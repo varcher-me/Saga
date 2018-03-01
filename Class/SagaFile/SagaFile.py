@@ -107,9 +107,10 @@ class SagaFile(SagaClass):
         try:
             self.search_insert_file()
             if self.__cache_status is False:
-                self.__file_handler.check_file_type()
+                # self.__file_handler.check_file_type()
                 self.__file_handler.process()
                 self.output_file_move()
+                self.finalize(True)
             else:
                 print("File %s hitted in cache, file seq = %d ." % (self.get_name(), self.__file_seq_no))
         except FileTypeErrorException as e:
@@ -118,9 +119,6 @@ class SagaFile(SagaClass):
             self.finalize(False, "FILE_PROCESS", str(e))
         except (WaitFileTimeOutException, FileMoveFailedException) as e:
             self.finalize(False, "FILE_FINAL_MOVE", str(e))
-        except Exception as e:
-            self.finalize(False, "UNKNOWN", str(e))
-        self.finalize(True)
         # todo：输出处理，统计
         return
 
@@ -129,11 +127,11 @@ class SagaFile(SagaClass):
             if is_success:
                 self.initial_file_move(True)
                 self.__mysql.commit()
-                pass
             else:
                 self.initial_file_move(False)
                 print(status_string)
                 print(status_comment)
+                self.__mysql.rollback()
         except (WaitFileTimeOutException, FileMoveFailedException) as e:
             self.get_logger().error("Initial File move failed for %s (reason: %s), Need processed manually."
                                     % (self.get_path_name(), str(e)))

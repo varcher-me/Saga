@@ -43,4 +43,5 @@ class MySQLConnector(SagaClass):
     def commit(self):
         self.__conn.commit()
 
-
+    def rollback(self):
+        self.__conn.rollback()

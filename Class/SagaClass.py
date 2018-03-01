@@ -75,7 +75,7 @@ class SagaClass:
         self.redisConnection = redis.Redis(host=redis_host,
                                            port=redis_port,
                                            db=redis_db,
-                                           # password=redis_token,
+                                           password=redis_token,
                                            decode_responses=True)
 
     def redis_set(self, key, value, ex):
