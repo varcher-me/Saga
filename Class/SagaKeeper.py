@@ -1,5 +1,6 @@
 from Class.SagaFile.SagaFile import SagaFile
 from Class.Handler.GdHandler import GdHandler
+from Class.Handler.WordHandler import WordHandler
 from Class.Connector.MySQLConnector import MySQLConnector
 from Class.Exception.SagaException import *
 from Class.SagaClass import SagaClass
@@ -17,6 +18,7 @@ class SagaKeeper(SagaClass):
         SagaClass.__init__(self)
         self.__heartInterval = self.get_param('heart_interval')
         self.__gdHandler = GdHandler()
+        self.__wordHandler = WordHandler()
         self.__mysql = MySQLConnector()
         self.__mysql.conn()
         return
@@ -42,6 +44,8 @@ class SagaKeeper(SagaClass):
                         file_ext = file.get_file_ext()
                         if ".gd" == file_ext:
                             file.set_handler(self.__gdHandler)
+                        if ".doc" == file_ext or ".docx" == file_ext:
+                            file.set_handler(self.__wordHandler)
                         else:
                             except_string = "Unknown ext for file: %s" % (file.get_path_name())
                             raise FileExtUnknownException(except_string)
