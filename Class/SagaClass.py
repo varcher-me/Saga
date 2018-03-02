@@ -1,13 +1,14 @@
 import configparser
 import os
 import logger
-import redis
 
 
 class SagaClass:
     params = {}
     logger = None
     redisConnection = None
+    __mysql = None
+    __redis = None
 
     def __init__(self):
         self.load_param()
@@ -67,21 +68,14 @@ class SagaClass:
         except Exception as e:
             return None
 
-    def redis_setup(self):      # todo redis链接后续建立connector
-        redis_host = self.get_param('redis_ip')
-        redis_port = self.get_param('redis_port')
-        redis_db = self.get_param('redis_db')
-        redis_token = self.get_param('redis_token')
-        self.redisConnection = redis.Redis(host=redis_host,
-                                           port=redis_port,
-                                           db=redis_db,
-                                           password=redis_token,
-                                           decode_responses=True)
+    def set_mysql(self, mysql):
+        self.__mysql = mysql
 
-    def redis_set(self, key, value, ex):
-        if self.redisConnection is None:
-            self.redis_setup()
-        self.redisConnection.set(key, value, ex)
+    def set_redis(self, redis):
+        self.__redis = redis
 
-    def redis_get(self, key):
-        return self.redisConnection.get(key)
+    def mysql(self):
+        return self.__mysql
+
+    def redis(self):
+        return self.__redis

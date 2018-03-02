@@ -13,7 +13,6 @@ class SagaFile(SagaClass):
     __file_seq_no = 0
     __cache_status = False
     __file_handler = None
-    __mysql = None
 
     def __init__(self, file_path, file_name):
         SagaClass.__init__(self)
@@ -43,9 +42,6 @@ class SagaFile(SagaClass):
         self.__file_handler.set_file_obj(self)
         return
 
-    def set_mysql(self, mysql):
-        self.__mysql = mysql
-
     def search_insert_file(self):
         if os.path.isfile(self.get_path_name()):
             file_sha1 = Calchash.calc_sha1(self.get_path_name())
@@ -53,7 +49,7 @@ class SagaFile(SagaClass):
             file_size = os.path.getsize(self.get_path_name())
         else:
             raise FileNotFoundError("File %s not found.")
-        file_seq_no, cache_status = self.__mysql.search_file(self.get_name(),
+        file_seq_no, cache_status = self.mysql().search_file(self.get_name(),
                                                              self.get_file_ext(),
                                                              file_size,
                                                              file_sha1,
@@ -126,12 +122,12 @@ class SagaFile(SagaClass):
         try:
             if is_success:
                 self.initial_file_move(True)
-                self.__mysql.commit()
+                self.mysql().commit()
             else:
                 self.initial_file_move(False)
                 print(status_string)
                 print(status_comment)
-                self.__mysql.rollback()
+                self.mysql().rollback()
         except (WaitFileTimeOutException, FileMoveFailedException) as e:
             self.get_logger().error("Initial File move failed for %s (reason: %s), Need processed manually."
                                     % (self.get_path_name(), str(e)))

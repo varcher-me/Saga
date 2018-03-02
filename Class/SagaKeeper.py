@@ -2,6 +2,7 @@ from Class.SagaFile.SagaFile import SagaFile
 from Class.Handler.GdHandler import GdHandler
 from Class.Handler.WordHandler import WordHandler
 from Class.Connector.MySQLConnector import MySQLConnector
+from Class.Connector.RedisConnector import RedisConnector
 from Class.Configure.Configure import Configure
 from Class.Exception.SagaException import *
 from Class.SagaClass import SagaClass
@@ -13,6 +14,7 @@ class SagaKeeper(SagaClass):
     __gdHandler = None
     __wordHandler = None
     __mysql = None
+    __redis = None
     __configure = None
     __lastHeartTime = 0
     __heartInterval = 0
@@ -24,6 +26,8 @@ class SagaKeeper(SagaClass):
         self.__wordHandler = WordHandler()
         self.__mysql = MySQLConnector()
         self.__mysql.conn()
+        self.__redis = RedisConnector()
+        self.__redis.redis_setup()
         self.__configure = Configure()
         return
 
@@ -31,7 +35,7 @@ class SagaKeeper(SagaClass):
         curr_time = time.time()
         if curr_time - self.__lastHeartTime > self.__heartInterval:
             self.__lastHeartTime = curr_time
-            self.redis_set('HeartBeat', curr_time, self.__heartInterval * 3)
+            self.__redis.redis_set('HeartBeat', curr_time, self.__heartInterval * 3)
             print("HeartBeat setup to %s (%d)" % (time.ctime(curr_time), curr_time))
             self.__mysql.ping()
 
@@ -54,6 +58,7 @@ class SagaKeeper(SagaClass):
                             except_string = "Unknown ext for file: %s" % (file.get_path_name())
                             raise FileExtUnknownException(except_string)
                         file.set_mysql(self.__mysql)
+                        file.set_redis(self.__redis)
                         # file.set_configure(self.__configure)
                         # file.build_logger()
                         file.process()
