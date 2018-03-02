@@ -8,8 +8,9 @@ import filetype
 
 
 class SagaFile(SagaClass):
-    __file_path = ''
-    __file_name = ''
+    __file_path = None
+    __file_name = None
+    __result_pathname = None
     __file_seq_no = 0
     __cache_status = False
     __file_handler = None
@@ -37,6 +38,9 @@ class SagaFile(SagaClass):
         raw_name, ext = os.path.splitext(self.__file_name)
         return raw_name
 
+    def get_result_pathname(self):
+        return self.__result_pathname
+
     def set_handler(self, handler):
         self.__file_handler = handler
         self.__file_handler.set_file_obj(self)
@@ -62,11 +66,12 @@ class SagaFile(SagaClass):
         file_printed = self.get_param('file_printed')  # PDF Creator创建的文件名
         path_result = self.get_param('path_result')  # 打印后文件移动到的位置
         printed_pathname = os.path.join(path_printed, file_printed)  # PDF Creator创建后文件的完整路径+文件名
-        moved_file = os.path.join(path_result, self.get_name() + '.pdf')  # 文件重命名后移动到目标位置后的完整路径+文件名
+        # 文件重命名后移动到目标位置后的完整路径+文件名
+        self.__result_pathname = os.path.join(path_result, self.get_name() + '.pdf')
 
         # 移动文件
         try:
-            self.move_file(printed_pathname, moved_file)
+            self.move_file(printed_pathname, self.__result_pathname)
         except WaitFileTimeOutException as e:
             self.logger.fatal(str(e))
             raise e
