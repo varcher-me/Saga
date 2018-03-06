@@ -45,7 +45,7 @@ class GdHandler(AbstractHandler):
         #     exit(100)
         return
 
-    def pseudo_print(self):
+    def output(self):
         # 发送打印指令
         win32gui.SetForegroundWindow(self.get_hwnd())
         win32api.keybd_event(17, 0, 0, 0)  # Ctrl

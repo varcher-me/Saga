@@ -30,7 +30,7 @@ class WordHandler(AbstractHandler):
         except pywintypes.com_error as e:
             raise FileOpenFailedException("Open word file failed.")
 
-    def pseudo_print(self):
+    def output(self):
         self.__doc.ExportAsFixedFormat(self.__output_file, constants.wdExportFormatPDF,
                                        Item=constants.wdExportDocumentContent,
                                        CreateBookmarks=constants.wdExportCreateHeadingBookmarks)

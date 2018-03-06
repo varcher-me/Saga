@@ -37,7 +37,7 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
     def process(self):
         try:
             self.open()
-            self.pseudo_print()
+            self.output()
             self.clean()
         except Exception as e:
             self.force_clean()
@@ -49,7 +49,7 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
         return
 
     @abc.abstractmethod
-    def pseudo_print(self):
+    def output(self):
         return
 
     @abc.abstractmethod

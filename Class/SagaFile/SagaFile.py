@@ -5,11 +5,13 @@ import Calchash
 from Class.SagaClass import SagaClass
 from Class.Exception.SagaException import *
 import filetype
+import uuid
 
 
 class SagaFile(SagaClass):
     __file_path = None
     __file_name = None
+    __server_file_name = None
     __result_pathname = None
     __file_seq_no = 0
     __cache_status = False
@@ -19,7 +21,11 @@ class SagaFile(SagaClass):
         SagaClass.__init__(self)
         self.__file_path = file_path
         self.__file_name = file_name
-        self.__file_name_raw, self.__file_name_ext = os.path.splitext(self.__file_name)
+        self.__server_file_name = None
+        self.__result_pathname = None
+        self.__file_seq_no = 0
+        self.__cache_status = False
+        # self.__file_name_raw, self.__file_name_ext = os.path.splitext(self.__file_name)
 
     def get_path_name(self):
         return self.__file_path + self.__file_name
@@ -37,6 +43,9 @@ class SagaFile(SagaClass):
     def get_file_raw_name(self):
         raw_name, ext = os.path.splitext(self.__file_name)
         return raw_name
+
+    def get_server_file_name(self):
+        return self.__server_file_name
 
     def get_result_pathname(self):
         return self.__result_pathname
@@ -61,13 +70,16 @@ class SagaFile(SagaClass):
         self.__file_seq_no = file_seq_no
         self.__cache_status = cache_status
 
+    def generate_server_file_name(self):
+        self.__server_file_name = uuid.uuid1()
+
     def output_file_move(self):
         path_printed = self.get_param('path_printed')  # PDF Creator创建的文件所在目录
         file_printed = self.get_param('file_printed')  # PDF Creator创建的文件名
         path_result = self.get_param('path_result')  # 打印后文件移动到的位置
         printed_pathname = os.path.join(path_printed, file_printed)  # PDF Creator创建后文件的完整路径+文件名
-        # 文件重命名后移动到目标位置后的完整路径+文件名
-        self.__result_pathname = os.path.join(path_result, self.get_name() + '.pdf')
+        # 文件重命名后移动到目标位置后的完整路径+随机文件名
+        self.__result_pathname = os.path.join(path_result, self.get_server_file_name() + '.pdf')
 
         # 移动文件
         try:
@@ -109,6 +121,7 @@ class SagaFile(SagaClass):
             self.search_insert_file()
             if self.__cache_status is False:
                 # self.__file_handler.check_file_type()
+                self.generate_server_file_name()
                 self.__file_handler.process()
                 self.output_file_move()
                 self.finalize(True)
