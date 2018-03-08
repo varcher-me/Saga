@@ -5,7 +5,6 @@ import Calchash
 from Class.SagaClass import SagaClass
 from Class.Exception.SagaException import *
 import filetype
-import uuid
 
 
 class SagaFile(SagaClass):
@@ -15,11 +14,15 @@ class SagaFile(SagaClass):
     __result_pathname = None
     __cache_status = False
     __file_handler = None
+    __file_uuid = None
+    __file_seq_no = None
 
-    def __init__(self, file_path, file_name):
+    def __init__(self, file_path, file_name, uuid, seq_no):
         SagaClass.__init__(self)
         self.__file_path = file_path
         self.__file_name = file_name
+        self.__file_uuid = uuid
+        self.__file_seq_no = seq_no
         # self.__file_name_raw, self.__file_name_ext = os.path.splitext(self.__file_name)
 
     def get_path_name(self):
@@ -174,3 +177,6 @@ class SagaFile(SagaClass):
         except Exception:
             return None
         return kind
+
+    def update_process_status(self, status, phase, comment):
+        self.mysql().update_status(self.__file_uuid, self.__file_seq_no, status, phase, comment)
