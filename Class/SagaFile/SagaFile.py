@@ -56,7 +56,7 @@ class SagaFile(SagaClass):
             file_md5 = Calchash.calc_md5(self.get_path_name())
             file_size = os.path.getsize(self.get_path_name())
         else:
-            raise FileNotFoundError("File %s not found.")
+            raise FileNotFoundError("File %s not found." % self.get_path_name())
         filename_server, cache_status = self.mysql().search_file(self.get_name(),
                                                                  self.get_file_ext(),
                                                                  file_size,
