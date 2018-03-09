@@ -132,14 +132,14 @@ class SagaFile(SagaClass):
         try:
             if is_success:
                 self.initial_file_move(True)
-                self.update_process_status(CONSTANT_PROCESS_STATUS_SUCCESS, status_string, status_comment)
-                self.mysql().commit()
+                self.update_server_filename()
+                self.update_process_status(CONSTANT_PROCESS_STATUS_SUCCESS)
             else:
                 self.initial_file_move(False)
                 print(status_string)
                 print(status_comment)
+                self.mysql().rollback()
                 self.update_process_status(CONSTANT_PROCESS_STATUS_FAIL, status_string, status_comment)
-                self.mysql().commit()
         except (WaitFileTimeOutException, FileMoveFailedException) as e:
             self.get_logger().error("Initial File move failed for %s (reason: %s), Need processed manually."
                                     % (self.get_path_name(), str(e)))
@@ -182,5 +182,8 @@ class SagaFile(SagaClass):
             return None
         return kind
 
-    def update_process_status(self, status, phase, comment):
+    def update_process_status(self, status, phase="", comment=""):
         self.mysql().update_status(self.__file_uuid, self.__file_seq_no, status, phase, comment)
+
+    def update_server_filename(self):
+        self.mysql().update_filename_server(self.__file_uuid, self.__file_seq_no, self.__file_name_server)

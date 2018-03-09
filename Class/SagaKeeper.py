@@ -71,6 +71,8 @@ class SagaKeeper(SagaClass):
                         self.__redis.rpush("INIT_QUEUE", uuid)  # resave the uuid as the last job
                         self.get_logger().fatal(except_string)
                         raise e
+                    finally:
+                        self.mysql().commit()
 
             self.heart_beat()
             print("Process finished or no file, sleep %d seconds." % sleep_interval)

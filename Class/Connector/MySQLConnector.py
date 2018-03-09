@@ -1,6 +1,7 @@
 from Class.SagaClass import SagaClass
 import pymysql
 import uuid
+import datetime
 
 
 class MySQLConnector(SagaClass):
@@ -63,6 +64,7 @@ class MySQLConnector(SagaClass):
             return False
 
     def get_uuid_fileist(self, in_uuid):
+        self.__conn.begin()
         cursor = self.__conn.cursor()
         cursor.execute("SELECT seq_no, filename_secure FROM history WHERE uuid = %s  LIMIT 500 FOR UPDATE", in_uuid)
         filelist = cursor.fetchall()
@@ -71,7 +73,14 @@ class MySQLConnector(SagaClass):
 
     def update_status(self, uuid, seq_no, status, phase, comment):
         cursor = self.__conn.cursor()
-        cursor.execute("UPDATE history SET process_status = %s, process_phase = %s, process_comment = %s "
+        cursor.execute("UPDATE history "
+                       "SET time_process = %s, process_status = %s, process_phase = %s, process_comment = %s "
                        "WHERE uuid = %s AND seq_no = %s",
-                       (status, phase, comment, uuid, seq_no))
+                       (datetime.datetime.now(), status, phase, comment, uuid, seq_no))
+        cursor.close()
+
+    def update_filename_server(self, uuid, seq_no, filename):
+        cursor = self.__conn.cursor()
+        cursor.execute("UPDATE history SET filename_server = %s WHERE uuid = %s AND seq_no = %s",
+                       (filename, uuid, seq_no))
         cursor.close()
