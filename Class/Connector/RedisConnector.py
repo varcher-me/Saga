@@ -16,7 +16,7 @@ class RedisConnector(SagaClass):
         self.__redisConnection = redis.Redis(host=redis_host,
                                              port=redis_port,
                                              db=redis_db,
-                                             password=redis_token,
+                                    #         password=redis_token,
                                              decode_responses=True)
 
     def set(self, key, value, ex=0):

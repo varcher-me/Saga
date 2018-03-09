@@ -46,7 +46,7 @@ class SagaKeeper(SagaClass):
 
         self.heart_beat()
         while True:
-            job_uuid_tuple = self.__redis.blpop("INIT_QUEUE", self.__heartInterval)  # todo: 从redis队列中获取要处理的id，然后去MYSQL里取文件名
+            job_uuid_tuple = self.__redis.blpop("INIT_QUEUE", self.__heartInterval)
             for uuid in job_uuid_tuple:
                 file_in_uuid = self.__mysql.get_uuid_fileist(uuid)
                 for file_record in file_in_uuid:
@@ -64,12 +64,11 @@ class SagaKeeper(SagaClass):
                         else:
                             except_string = "Unknown ext for file: %s" % (file.get_path_name())
                             file.update_process_status(CT.CONSTANT_PROCESS_STATUS_FAIL, "INIT", "Unknown ext")
-                        # file.set_configure(self.__configure)
-                        # file.build_logger()
                         file.process()
                     except Exception as e:
                         except_string = "FATAL ERROR: something error, exception is >>>" + str(e) + "<<<."
                         print(except_string)
+                        self.__redis.rpush("INIT_QUEUE", uuid)  # resave the uuid as the last job
                         self.get_logger().fatal(except_string)
                         raise e
 

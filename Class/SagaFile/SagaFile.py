@@ -4,6 +4,7 @@ import shutil
 import Calchash
 from Class.SagaClass import SagaClass
 from Class.Exception.SagaException import *
+from Constants.Constants import *
 import filetype
 
 
@@ -131,18 +132,21 @@ class SagaFile(SagaClass):
         try:
             if is_success:
                 self.initial_file_move(True)
+                self.update_process_status(CONSTANT_PROCESS_STATUS_SUCCESS, status_string, status_comment)
                 self.mysql().commit()
             else:
                 self.initial_file_move(False)
                 print(status_string)
                 print(status_comment)
-                self.mysql().rollback()
+                self.update_process_status(CONSTANT_PROCESS_STATUS_FAIL, status_string, status_comment)
+                self.mysql().commit()
         except (WaitFileTimeOutException, FileMoveFailedException) as e:
             self.get_logger().error("Initial File move failed for %s (reason: %s), Need processed manually."
                                     % (self.get_path_name(), str(e)))
         except Exception as e:
             self.get_logger().error("Finalize for %s (reason: %s) failed, Need processed manually."
                                     % (self.get_path_name(), str(e)))
+            raise e
 
     # 下面都是工具方法
     def move_file(self, origin_file, new_file, no_wait=False):
