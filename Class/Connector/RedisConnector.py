@@ -35,8 +35,16 @@ class RedisConnector(SagaClass):
             self.setup()
         self.__redisConnection.rpush(key, value)
 
+    def lpush(self, key, value):
+        if self.__redisConnection is None:
+            self.setup()
+        self.__redisConnection.lpush(key, value)
+
     def blpop(self, key, ex=0):
         if self.__redisConnection is None:
             self.setup()
         value = self.__redisConnection.blpop(key, ex)
-        return value
+        if value is None:
+            return None, None
+        else:
+            return value
