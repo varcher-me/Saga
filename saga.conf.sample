@@ -12,7 +12,6 @@ file_printed = PrintedPDF.pdf
 [interval]
 retry_interval = 0.5
 retry_seconds = 10
-sleep_interval = 5
 heart_interval = 60
 
 [redis]

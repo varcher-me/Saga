@@ -39,7 +39,6 @@ class SagaKeeper(SagaClass):
 
     def do(self):
         path_init = self.get_param("path_init")
-        sleep_interval = self.get_param("sleep_interval")
 
         self.heart_beat()
         while True:
