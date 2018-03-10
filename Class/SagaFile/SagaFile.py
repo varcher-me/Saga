@@ -6,6 +6,7 @@ from Class.SagaClass import SagaClass
 from Class.Exception.SagaException import *
 from Constants.Constants import *
 import filetype
+import uuid
 
 
 class SagaFile(SagaClass):
@@ -17,6 +18,9 @@ class SagaFile(SagaClass):
     __file_handler = None
     __file_uuid = None
     __file_seq_no = None
+    __file_sha1 = None
+    __file_md5 = None
+    __file_size = None
 
     def __init__(self, file_path, file_name, uuid, seq_no):
         SagaClass.__init__(self)
@@ -53,18 +57,28 @@ class SagaFile(SagaClass):
 
     def search_insert_file(self):
         if os.path.isfile(self.get_path_name()):
-            file_sha1 = Calchash.calc_sha1(self.get_path_name())
-            file_md5 = Calchash.calc_md5(self.get_path_name())
-            file_size = os.path.getsize(self.get_path_name())
+            self.__file_sha1 = Calchash.calc_sha1(self.get_path_name())
+            self.__file_md5 = Calchash.calc_md5(self.get_path_name())
+            self.__file_size = os.path.getsize(self.get_path_name())
         else:
             raise FileNotFoundError("File %s not found." % self.get_path_name())
-        filename_server, cache_status = self.mysql().search_file(self.get_name(),
-                                                                 self.get_file_ext(),
-                                                                 file_size,
-                                                                 file_sha1,
-                                                                 file_md5)
+        filename_server = self.mysql().search_file(self.get_name(),
+                                                   self.get_file_ext(),
+                                                   self.__file_size,
+                                                   self.__file_sha1,
+                                                   self.__file_md5)
+        if filename_server is None:
+            self.__cache_status = False
+        else:
+            self.__cache_status = True
+            self.__file_name_server = filename_server
+
+    def generate_filename_server(self):
+        while True:
+            filename_server = uuid.uuid1().hex
+            if not self.mysql().is_exist_filename_server(filename_server):
+                break
         self.__file_name_server = filename_server
-        self.__cache_status = cache_status
 
     def output_file_move(self):
         path_printed = self.get_param('path_printed')  # PDF Creator创建的文件所在目录
@@ -113,32 +127,35 @@ class SagaFile(SagaClass):
         try:
             self.search_insert_file()
             if self.__cache_status is False:
-                # self.__file_handler.check_file_type()
+                self.generate_filename_server()
                 self.__file_handler.process()
                 self.output_file_move()
                 self.finalize(True)
             else:
                 print("File %s hitted in cache, file seq = %d ." % (self.get_name(), self.__file_name_server))
+        except FileNotFoundError as e:
+            self.finalize(False, "FILE_INIT", str(e), no_move=True)
         except FileTypeErrorException as e:
             self.finalize(False, "FILE_TYPE_CHECK", str(e))
         except (FileOpenFailedException, FileOperaException) as e:
             self.finalize(False, "FILE_PROCESS", str(e))
         except (WaitFileTimeOutException, FileMoveFailedException) as e:
             self.finalize(False, "FILE_FINAL_MOVE", str(e))
-        # todo：输出处理，统计
+        finally:
+            self.mysql().commit()
         return
 
-    def finalize(self, is_success=True, status_string=None, status_comment=None):   # todo 失败情况，增加重试次数
+    def finalize(self, is_success=True, status_string=None, status_comment=None, no_move=False):  # todo 失败情况，增加重试次数
         try:
             if is_success:
                 self.initial_file_move(True)
                 self.update_server_filename()
                 self.update_process_status(CONSTANT_PROCESS_STATUS_SUCCESS)
             else:
-                self.initial_file_move(False)
+                if not no_move:
+                    self.initial_file_move(False)
                 print(status_string)
                 print(status_comment)
-                self.mysql().rollback()
                 self.update_process_status(CONSTANT_PROCESS_STATUS_FAIL, status_string, status_comment)
         except (WaitFileTimeOutException, FileMoveFailedException) as e:
             self.get_logger().error("Initial File move failed for %s (reason: %s), Need processed manually."
@@ -187,3 +204,11 @@ class SagaFile(SagaClass):
 
     def update_server_filename(self):
         self.mysql().update_filename_server(self.__file_uuid, self.__file_seq_no, self.__file_name_server)
+
+    def insert_filelist(self):
+        self.mysql().insert_filelist(self.__file_name_server,
+                                     self.get_name(),
+                                     self.get_file_ext(),
+                                     self.__file_size,
+                                     self.__file_sha1,
+                                     self.__file_md5)

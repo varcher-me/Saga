@@ -71,7 +71,7 @@ class SagaKeeper(SagaClass):
 
                     except FileExtUnknownException as e:
                         file.update_process_status(CT.CONSTANT_PROCESS_STATUS_FAIL, "INIT", "Unknown ext")
-                        self.mysql().commit()
+                        self.__mysql.commit()
                         self.get_logger().log(str(e))
 
                     except Exception as e:
@@ -80,5 +80,5 @@ class SagaKeeper(SagaClass):
                         self.__redis.lpush("INIT_QUEUE", uuid)  # resave the uuid as the first job
                         self.get_logger().fatal(except_string)
                         raise e
-
+                self.__mysql.commit()
             self.heart_beat()

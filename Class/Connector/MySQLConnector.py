@@ -1,6 +1,5 @@
 from Class.SagaClass import SagaClass
 import pymysql
-import uuid
 import datetime
 
 
@@ -31,21 +30,11 @@ class MySQLConnector(SagaClass):
                        (file_ext, file_size, file_sha, file_md5))
         filename_server = cursor.fetchone()
         cursor.close()
+
         if filename_server is None:
-            while True:
-                filename_server = uuid.uuid1().hex
-                if not self.is_exist_filename_server(filename_server):
-                    break
-            cursor = self.__conn.cursor()
-            cursor.execute("INSERT INTO filelist "
-                           "(filename_server, filename_secure,filename_ext,file_size,file_sha,file_md5) "
-                           "VALUES (%s, %s, %s, %s, %s, %s)",
-                           (filename_server, file_name, file_ext, file_size, file_sha, file_md5))
-            cursor.close()
-            cache_status = False
+            return None
         else:
-            filename_server = filename_server[0]
-        return filename_server, cache_status
+            return filename_server[0]
 
     def commit(self):
         self.__conn.commit()
@@ -83,4 +72,12 @@ class MySQLConnector(SagaClass):
         cursor = self.__conn.cursor()
         cursor.execute("UPDATE history SET filename_server = %s WHERE uuid = %s AND seq_no = %s",
                        (filename, uuid, seq_no))
+        cursor.close()
+
+    def insert_filelist(self, filename_server, file_name, file_ext, file_size, file_sha, file_md5):
+        cursor = self.__conn.cursor()
+        cursor.execute("INSERT INTO filelist "
+                       "(filename_server, filename_secure,filename_ext,file_size,file_sha,file_md5) "
+                       "VALUES (%s, %s, %s, %s, %s, %s)",
+                       (filename_server, file_name, file_ext, file_size, file_sha, file_md5))
         cursor.close()
