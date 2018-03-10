@@ -1,6 +1,8 @@
-from Class.Connector.SagaConnector import SagaConnector
-import pymysql
 import datetime
+
+import pymysql
+
+from Connector.SagaConnector import SagaConnector
 
 
 class MySQLConnector(SagaConnector):

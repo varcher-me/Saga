@@ -1,8 +1,8 @@
 import configparser
 import os
+from Connector.RedisConnector import RedisConnector
 import logger
-from Class.Connector.MySQLConnector import MySQLConnector
-from Class.Connector.RedisConnector import RedisConnector
+from Connector.MySQLConnector import MySQLConnector
 
 
 class SagaClass:

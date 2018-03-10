@@ -1,5 +1,6 @@
 import redis
-from Class.Connector.SagaConnector import SagaConnector
+
+from Connector.SagaConnector import SagaConnector
 
 
 class RedisConnector(SagaConnector):

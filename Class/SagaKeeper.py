@@ -1,14 +1,13 @@
-from Class.SagaFile.SagaFile import SagaFile
-from Class.Handler.GdHandler import GdHandler
-from Class.Handler.WordHandler import WordHandler
-from Class.Connector.MySQLConnector import MySQLConnector
-from Class.Connector.RedisConnector import RedisConnector
+import time
+from Connector.RedisConnector import RedisConnector
+import Constants.Constants as CT
 from Class.Configure.Configure import Configure
 from Class.Exception.SagaException import *
+from Class.Handler.GdHandler import GdHandler
+from Class.Handler.WordHandler import WordHandler
 from Class.SagaClass import SagaClass
-import time
-import Constants.Constants as CT
-import os
+from Class.SagaFile.SagaFile import SagaFile
+from Connector.MySQLConnector import MySQLConnector
 
 
 class SagaKeeper(SagaClass):
