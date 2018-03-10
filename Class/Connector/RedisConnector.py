@@ -1,12 +1,12 @@
 import redis
-from Class.SagaClass import SagaClass
+from Class.Connector.SagaConnector import SagaConnector
 
 
-class RedisConnector(SagaClass):
+class RedisConnector(SagaConnector):
     __redisConnection = None
 
     def __init__(self):
-        SagaClass.__init__(self)
+        SagaConnector.__init__(self)
 
     def setup(self):      # todo redis链接后续建立connector
         redis_host = self.get_param('redis_ip')

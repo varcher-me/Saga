@@ -23,7 +23,7 @@ class SagaKeeper(SagaClass):
         self.__heartInterval = self.get_param('heart_interval')
         self.__gdHandler = GdHandler()
         self.__wordHandler = WordHandler()
-        self.set_mysql( MySQLConnector())
+        self.set_mysql(MySQLConnector())
         self.mysql().conn()
         self.set_redis(RedisConnector())
         self.redis().setup()

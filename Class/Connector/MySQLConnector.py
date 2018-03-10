@@ -1,13 +1,13 @@
-from Class.SagaClass import SagaClass
+from Class.Connector.SagaConnector import SagaConnector
 import pymysql
 import datetime
 
 
-class MySQLConnector(SagaClass):
+class MySQLConnector(SagaConnector):
     __conn = None
 
     def __init__(self):
-        SagaClass.__init__(self)
+        SagaConnector.__init__(self)
 
     def conn(self):
         self.__conn = pymysql.connect(host=self.get_param('mysql_ip'),
