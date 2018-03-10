@@ -1,6 +1,8 @@
 import configparser
 import os
 import logger
+from Class.Connector.MySQLConnector import MySQLConnector
+from Class.Connector.RedisConnector import RedisConnector
 
 
 class SagaClass:
@@ -74,8 +76,8 @@ class SagaClass:
     def set_redis(self, redis):
         self.__redis = redis
 
-    def mysql(self):
+    def mysql(self) -> MySQLConnector:
         return self.__mysql
 
-    def redis(self):
+    def redis(self) -> RedisConnector:
         return self.__redis

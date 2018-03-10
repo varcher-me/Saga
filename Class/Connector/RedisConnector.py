@@ -40,7 +40,7 @@ class RedisConnector(SagaClass):
             self.setup()
         self.__redisConnection.lpush(key, value)
 
-    def blpop(self, key, ex=0):
+    def blpop(self, key, ex=0) -> tuple:
         if self.__redisConnection is None:
             self.setup()
         value = self.__redisConnection.blpop(key, ex)

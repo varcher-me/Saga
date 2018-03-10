@@ -14,8 +14,6 @@ import os
 class SagaKeeper(SagaClass):
     __gdHandler = None
     __wordHandler = None
-    __mysql = None
-    __redis = None
     __configure = None
     __lastHeartTime = 0
     __heartInterval = 0
@@ -25,10 +23,10 @@ class SagaKeeper(SagaClass):
         self.__heartInterval = self.get_param('heart_interval')
         self.__gdHandler = GdHandler()
         self.__wordHandler = WordHandler()
-        self.__mysql = MySQLConnector()
-        self.__mysql.conn()
-        self.__redis = RedisConnector()
-        self.__redis.setup()
+        self.set_mysql( MySQLConnector())
+        self.mysql().conn()
+        self.set_redis(RedisConnector())
+        self.redis().setup()
         self.__configure = Configure()
         return
 
@@ -36,9 +34,9 @@ class SagaKeeper(SagaClass):
         curr_time = time.time()
         if curr_time - self.__lastHeartTime > self.__heartInterval:
             self.__lastHeartTime = curr_time
-            self.__redis.set('HeartBeat', curr_time, self.__heartInterval * 3)
+            self.redis().set('HeartBeat', curr_time, self.__heartInterval * 3)
             print("HeartBeat setup to %s (%d)" % (time.ctime(curr_time), curr_time))
-            self.__mysql.ping()
+            self.mysql().ping()
 
     def do(self):
         path_init = self.get_param("path_init")
@@ -46,17 +44,17 @@ class SagaKeeper(SagaClass):
 
         self.heart_beat()
         while True:
-            (uuid_queue, uuid) = self.__redis.blpop("INIT_QUEUE", self.__heartInterval)
+            (uuid_queue, uuid) = self.redis().blpop("INIT_QUEUE", self.__heartInterval)
             if "INIT_QUEUE" == uuid_queue:
                 print("Get jobid = %s" % uuid)
-                file_in_uuid = self.__mysql.get_uuid_fileist(uuid)
+                file_in_uuid = self.mysql().get_uuid_fileist(uuid)
                 for file_record in file_in_uuid:
                     file_seq_no = file_record[0]
                     file_secure_name = file_record[1]
                     file = SagaFile(path_init, file_secure_name, uuid, file_seq_no)
                     try:
-                        file.set_mysql(self.__mysql)
-                        file.set_redis(self.__redis)
+                        file.set_mysql(self.mysql())
+                        file.set_redis(self.redis())
                         file_ext = file.get_file_ext()
 
                         if ".gd" == file_ext:
@@ -71,14 +69,14 @@ class SagaKeeper(SagaClass):
 
                     except FileExtUnknownException as e:
                         file.update_process_status(CT.CONSTANT_PROCESS_STATUS_FAIL, "INIT", "Unknown ext")
-                        self.__mysql.commit()
+                        self.mysql().commit()
                         self.get_logger().log(str(e))
 
                     except Exception as e:
                         except_string = "FATAL ERROR: something error, exception is >>>" + str(e) + "<<<."
                         print(except_string)
-                        self.__redis.lpush("INIT_QUEUE", uuid)  # resave the uuid as the first job
+                        self.redis().lpush("INIT_QUEUE", uuid)  # resave the uuid as the first job
                         self.get_logger().fatal(except_string)
                         raise e
-                self.__mysql.commit()
+                self.mysql().commit()
             self.heart_beat()
