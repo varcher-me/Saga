@@ -21,18 +21,6 @@ class SagaConnector:
             print("FATAL ERROR: config file cannot find.")
             exit(200)
         config.read(config_file)
-        self.set_param('path_init', config.get('path', 'path_init'))
-        self.set_param('path_processed', config.get('path', 'path_processed'))
-        self.set_param('path_error', config.get('path', 'path_error'))
-        self.set_param('path_result', config.get('path', 'path_result'))
-        self.set_param('path_printed', config.get('path', 'path_printed'))
-        self.set_param('file_printed', config.get('path', 'file_printed'))
-
-        self.set_param('retry_interval', config.getfloat('interval', 'retry_interval'))
-        self.set_param('retry_seconds', config.getfloat('interval', 'retry_seconds'))
-        self.set_param('sleep_interval', config.getint('interval', 'sleep_interval'))
-        self.set_param('heart_interval', config.getint('interval', 'heart_interval'))
-
         self.set_param('redis_ip', config.get('redis', 'redis_ip'))
         self.set_param('redis_port', config.getint('redis', 'redis_port'))
         self.set_param('redis_db', config.getint('redis', 'redis_db'))
