@@ -68,7 +68,7 @@ class SagaKeeper(SagaClass):
                     except FileExtUnknownException as e:
                         file.update_process_status(CT.CONSTANT_PROCESS_STATUS_FAIL, "INIT", "Unknown ext")
                         self.mysql().commit()
-                        self.get_logger().log(str(e))
+                        self.get_logger().warning(str(e))
 
                     except Exception as e:
                         except_string = "FATAL ERROR: something error, exception is >>>" + str(e) + "<<<."

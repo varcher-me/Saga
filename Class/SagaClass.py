@@ -35,7 +35,6 @@ class SagaClass:
 
         self.set_param('retry_interval', config.getfloat('interval', 'retry_interval'))
         self.set_param('retry_seconds', config.getfloat('interval', 'retry_seconds'))
-        self.set_param('sleep_interval', config.getint('interval', 'sleep_interval'))
         self.set_param('heart_interval', config.getint('interval', 'heart_interval'))
 
         self.set_param('log_file', config.get('log', 'log_file'))

@@ -13,11 +13,17 @@ class RedisConnector(SagaConnector):
         redis_port = self.get_param('redis_port')
         redis_db = self.get_param('redis_db')
         redis_token = self.get_param('redis_token')
-        self.__redisConnection = redis.Redis(host=redis_host,
-                                             port=redis_port,
-                                             db=redis_db,
-                                             password=redis_token,
-                                             decode_responses=True)
+        if redis_token == "":
+            self.__redisConnection = redis.Redis(host=redis_host,
+                                                 port=redis_port,
+                                                 db=redis_db,
+                                                 decode_responses=True)
+        else:
+            self.__redisConnection = redis.Redis(host=redis_host,
+                                                 port=redis_port,
+                                                 db=redis_db,
+                                                 password=redis_token,
+                                                 decode_responses=True)
 
     def set(self, key, value, ex=0):
         if self.__redisConnection is None:
