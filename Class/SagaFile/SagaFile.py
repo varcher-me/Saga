@@ -131,7 +131,7 @@ class SagaFile(SagaClass):
                 self.output_file_move()
                 self.finalize(True)
             else:
-                print("File %s hitted in cache, file seq = %d ." % (self.get_name(), self.__file_name_server))
+                print("File %s hitted in cache, file seq = %s ." % (self.get_name(), self.__file_name_server))
         except FileNotFoundError as e:
             self.finalize(False, "FILE_INIT", str(e), no_move=True)
         except FileTypeErrorException as e:
@@ -150,6 +150,7 @@ class SagaFile(SagaClass):
                 self.initial_file_move(True)
                 self.update_server_filename()
                 self.update_process_status(CONSTANT_PROCESS_STATUS_SUCCESS)
+                self.insert_filelist()
             else:
                 if not no_move:
                     self.initial_file_move(False)
