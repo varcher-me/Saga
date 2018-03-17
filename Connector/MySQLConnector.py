@@ -55,7 +55,8 @@ class MySQLConnector(SagaConnector):
     def get_uuid_fileist(self, in_uuid):
         self.__conn.begin()
         cursor = self.__conn.cursor()
-        cursor.execute("SELECT seq_no, filename_secure FROM history WHERE uuid = %s  LIMIT 500 FOR UPDATE", in_uuid)
+        cursor.execute("SELECT seq_no, filename_secure FROM history "
+                       "WHERE uuid = %s AND process_status = 1 LIMIT 500 FOR UPDATE", in_uuid)
         filelist = cursor.fetchall()
         cursor.close()
         return filelist
