@@ -1,3 +1,9 @@
+/*
+SQLyog  v12.2.6 (64 bit)
+MySQL - 5.7.19-log : Database - saga
+*********************************************************************
+*/
+
 /*!40101 SET NAMES utf8 */;
 
 /*!40101 SET SQL_MODE=''*/;
@@ -15,33 +21,49 @@ USE `saga`;
 DROP TABLE IF EXISTS `filelist`;
 
 CREATE TABLE `filelist` (
-  `file_seq_no` int(16) NOT NULL AUTO_INCREMENT,
+  `filename_server` varchar(50) COLLATE utf8mb4_bin NOT NULL,
   `filename_secure` varchar(200) COLLATE utf8mb4_bin DEFAULT NULL,
   `filename_ext` varchar(20) COLLATE utf8mb4_bin DEFAULT NULL,
   `file_size` bigint(20) unsigned DEFAULT NULL,
   `file_sha` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
   `file_md5` varchar(32) COLLATE utf8mb4_bin DEFAULT NULL,
-  PRIMARY KEY (`file_seq_no`),
+  PRIMARY KEY (`filename_server`),
   KEY `IK1` (`file_size`,`filename_ext`,`file_sha`,`file_md5`),
   KEY `IK2` (`filename_secure`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 /*Table structure for table `history` */
 
 DROP TABLE IF EXISTS `history`;
 
 CREATE TABLE `history` (
-  `uuid` varchar(32) COLLATE utf8mb4_bin NOT NULL,
-  `status` tinyint(3) unsigned DEFAULT NULL,
-  `app_token` varchar(10) COLLATE utf8mb4_bin DEFAULT NULL,
-  `app_uuid` varchar(32) COLLATE utf8mb4_bin DEFAULT NULL,
+  `uuid` varchar(40) COLLATE utf8mb4_bin NOT NULL,
+  `seq_no` int(5) NOT NULL,
+  `process_status` tinyint(3) unsigned DEFAULT NULL,
+  `appid` varchar(5) COLLATE utf8mb4_bin DEFAULT NULL,
+  `userid` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `userip` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
   `time_post` datetime DEFAULT NULL,
   `time_process` datetime DEFAULT NULL,
   `filename_post` varchar(200) COLLATE utf8mb4_bin DEFAULT NULL,
   `filename_secure` varchar(200) COLLATE utf8mb4_bin DEFAULT NULL,
-  `file_seq_no` int(16) DEFAULT NULL,
+  `filename_server` varchar(50) COLLATE utf8mb4_bin DEFAULT NULL,
   `process_phase` varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
-  `comment` varchar(500) COLLATE utf8mb4_bin DEFAULT NULL,
+  `process_comment` varchar(500) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`uuid`,`seq_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+/*Table structure for table `postlist` */
+
+DROP TABLE IF EXISTS `postlist`;
+
+CREATE TABLE `postlist` (
+  `uuid` varchar(40) COLLATE utf8mb4_bin NOT NULL,
+  `appid` varchar(5) COLLATE utf8mb4_bin DEFAULT NULL,
+  `userid` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `userip` varchar(40) COLLATE utf8mb4_bin DEFAULT NULL,
+  `time_post` datetime DEFAULT NULL,
+  `process_status` tinyint(3) unsigned DEFAULT NULL,
   PRIMARY KEY (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
