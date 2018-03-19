@@ -34,10 +34,10 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
         self.__file_type_in_handler = file_type_in_handler
         return
 
-    def process(self):
+    def process(self, init_path_file, result_path_file):
         try:
-            self.open()
-            self.output()
+            self.open(init_path_file)
+            self.output(result_path_file)
             self.clean()
         except Exception as e:
             self.force_clean()
@@ -45,11 +45,11 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
         return
 
     @abc.abstractmethod
-    def open(self):
+    def open(self, init_path_name):
         return
 
     @abc.abstractmethod
-    def output(self):
+    def output(self, result_path_name):
         return
 
     @abc.abstractmethod
@@ -115,3 +115,6 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
     def force_clean(self):
         win32api.SendMessage(self.get_hwnd(), win32con.WM_CLOSE, 0, 0)
         return
+
+    def need_final_move(self):
+        return False

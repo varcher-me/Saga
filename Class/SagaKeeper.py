@@ -54,10 +54,9 @@ class SagaKeeper(SagaClass):
                         file.set_mysql(self.mysql())
                         file.set_redis(self.redis())
                         file_ext = file.get_file_ext()
-
                         if ".gd" == file_ext:
                             file.set_handler(self.__gdHandler)
-                        if ".doc" == file_ext or ".docx" == file_ext:
+                        elif ".doc" == file_ext or ".docx" == file_ext:
                             file.set_handler(self.__wordHandler)
                         else:
                             except_string = "Unknown ext for file: %s" % (file.get_path_name())

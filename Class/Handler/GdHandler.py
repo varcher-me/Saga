@@ -1,6 +1,7 @@
 import win32api
 import win32gui
 import win32con
+import os
 from Class.Handler.AbstractHandler import AbstractHandler
 from Class.Exception.SagaException import *
 
@@ -14,12 +15,11 @@ class GdHandler(AbstractHandler):
         #     self.set_hwnd(hwnd)
         return
 
-    def open(self):
-        file_path_name = self.get_file_obj().get_path_name()
-        file_path = self.get_file_obj().get_path()
-        file_name = self.get_file_obj().get_name()
+    def open(self, init_path_name):
+        file_path_name = init_path_name
+        file_path, file_name = os.path.split(file_path_name)
         print("Starting processing " + file_path_name)
-        win32api.ShellExecute(0, 'open', file_path + file_name, '', '', 1)
+        win32api.ShellExecute(0, 'open', file_path_name, '', '', 1)
         # hwnd = self.get_hwnd()
         # if hwnd:
         #     fail_hwnd = self.get_window(None, None, None, 'Reader', True)
@@ -38,14 +38,14 @@ class GdHandler(AbstractHandler):
             except WaitWindowTimeOutException as e:
                 win32api.SendMessage(fail_hwnd, win32con.WM_CLOSE, 0, 0)
                 # logger.error("File [" + raw_file + "] print-window-disappear timed out; WM_CLOSE signal sent.")
-            raise FileOpenFailedException("File %s Open Failed." % (self.get_file_obj().get_path_name()))
+            raise FileOpenFailedException("File %s Open Failed." % file_path_name)
         self.set_hwnd(hwnd)
         # if 0 == hwnd_main_sep:
         #     # logger.fatal("FATAL ERROR: SEP Reader Window not found! program terminated.")
         #     exit(100)
         return
 
-    def output(self):
+    def output(self, result_path_name):
         # 发送打印指令
         win32gui.SetForegroundWindow(self.get_hwnd())
         win32api.keybd_event(17, 0, 0, 0)  # Ctrl
@@ -81,3 +81,6 @@ class GdHandler(AbstractHandler):
     # def check_file_type(self):
     #     # GD文件无法获取MIME特征，直接跳过检查
     #     return
+
+    def need_final_move(self):
+        return True

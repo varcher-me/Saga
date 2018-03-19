@@ -27,6 +27,7 @@ class SagaFile(SagaClass):
         self.__file_name = file_name
         self.__file_uuid = uuid
         self.__file_seq_no = seq_no
+        print("Init for file %s ready." % self.__file_name)
         # self.__file_name_raw, self.__file_name_ext = os.path.splitext(self.__file_name)
 
     def get_path_name(self):
@@ -78,14 +79,13 @@ class SagaFile(SagaClass):
             if not self.mysql().is_exist_filename_server(filename_server):
                 break
         self.__file_name_server = filename_server
+        path_result = self.get_param('path_result')  # 打印后文件移动到的位置
+        self.__result_pathname = os.path.join(path_result, self.__file_name_server + '.pdf')
 
     def output_file_move(self):
         path_printed = self.get_param('path_printed')  # PDF Creator创建的文件所在目录
         file_printed = self.get_param('file_printed')  # PDF Creator创建的文件名
-        path_result = self.get_param('path_result')  # 打印后文件移动到的位置
         printed_pathname = os.path.join(path_printed, file_printed)  # PDF Creator创建后文件的完整路径+文件名
-        # 文件重命名后移动到目标位置后的完整路径+随机文件名
-        self.__result_pathname = os.path.join(path_result, self.__file_name_server + '.pdf')
 
         # 移动文件
         try:
@@ -99,28 +99,28 @@ class SagaFile(SagaClass):
             raise FileMoveFailedException(exception_str)
         return
 
-    def initial_file_move(self, is_success=True):
-        path_init = self.get_param("path_init")
-        if is_success:
-            path_finish = self.get_param("path_processed")
-        else:
-            path_finish = self.get_param("path_error")
-        file_init = os.path.join(path_init, self.get_name())
-        file_moved = os.path.join(path_finish, self.get_name())
-        print("FILE MOVED = " + file_moved)
-        if os.path.isfile(file_moved):
-            os.remove(file_moved)
-        # 移动文件
-        try:
-            self.move_file(file_init, file_moved, no_wait=True)
-        except WaitFileTimeOutException as e:
-            self.logger.fatal(str(e))
-            raise e
-        except Exception as e:
-            exception_str = "FATAL ERROR: move file failed, exception is " + str(e) + ", process terminated."
-            self.logger.fatal(exception_str)
-            raise FileMoveFailedException(exception_str)
-        return
+    # def initial_file_move(self, is_success=True):
+    #     path_init = self.get_param("path_init")
+    #     if is_success:
+    #         path_finish = self.get_param("path_processed")
+    #     else:
+    #         path_finish = self.get_param("path_error")
+    #     file_init = os.path.join(path_init, self.get_name())
+    #     file_moved = os.path.join(path_finish, self.get_name())
+    #     print("FILE MOVED = " + file_moved)
+    #     if os.path.isfile(file_moved):
+    #         os.remove(file_moved)
+    #     # 移动文件
+    #     try:
+    #         self.move_file(file_init, file_moved, no_wait=True)
+    #     except WaitFileTimeOutException as e:
+    #         self.logger.fatal(str(e))
+    #         raise e
+    #     except Exception as e:
+    #         exception_str = "FATAL ERROR: move file failed, exception is " + str(e) + ", process terminated."
+    #         self.logger.fatal(exception_str)
+    #         raise FileMoveFailedException(exception_str)
+    #     return
 
     def process(self):
         try:
@@ -130,8 +130,9 @@ class SagaFile(SagaClass):
                 self.finalize(True, cache=True)
             else:
                 self.generate_filename_server()
-                self.__file_handler.process()
-                self.output_file_move()
+                self.__file_handler.process(self.get_path_name(), self.get_result_pathname())
+                if self.__file_handler.need_final_move() is True:
+                    self.output_file_move()
                 self.finalize(True)
         except FileNotFoundError as e:
             self.finalize(False, "FILE_INIT", str(e), no_move=True)
@@ -148,16 +149,16 @@ class SagaFile(SagaClass):
     def finalize(self, is_success=True, status_string=None, status_comment=None, no_move=False, cache=False):  # todo 失败情况，增加重试次数
         try:
             if is_success:
-                self.initial_file_move(True)
                 self.update_server_filename()
                 if cache is True:
                     self.update_process_status(CONSTANT_PROCESS_STATUS_CACHE)
                 else:
                     self.update_process_status(CONSTANT_PROCESS_STATUS_SUCCESS)
                     self.insert_filelist()
+                # self.initial_file_move(True)
             else:
-                if not no_move:
-                    self.initial_file_move(False)
+                # if not no_move:
+                #     self.initial_file_move(False)
                 print(status_string)
                 print(status_comment)
                 self.update_process_status(CONSTANT_PROCESS_STATUS_FAIL, status_string, status_comment)
