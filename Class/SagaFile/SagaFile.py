@@ -52,7 +52,6 @@ class SagaFile(SagaClass):
 
     def set_handler(self, handler):
         self.__file_handler = handler
-        self.__file_handler.set_file_obj(self)
         return
 
     def search_insert_file(self):

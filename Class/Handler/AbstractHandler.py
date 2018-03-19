@@ -9,7 +9,6 @@ from Class.Exception.SagaException import *
 
 class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
     __hwnd = None
-    __file_obj = None
     __file_type_in_handler = None
 
     def __init__(self):
@@ -22,13 +21,6 @@ class AbstractHandler(SagaClass, metaclass=abc.ABCMeta):
 
     def get_hwnd(self):
         return self.__hwnd
-
-    def set_file_obj(self, file_obj):
-        self.__file_obj = file_obj
-        return
-
-    def get_file_obj(self):
-        return self.__file_obj
 
     def set_file_type_in_handler(self, file_type_in_handler):
         self.__file_type_in_handler = file_type_in_handler
