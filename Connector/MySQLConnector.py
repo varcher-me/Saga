@@ -69,6 +69,11 @@ class MySQLConnector(SagaConnector):
                        (datetime.datetime.now(), status, phase, comment, uuid, seq_no))
         cursor.close()
 
+    def update_postlist_status(self, uuid, status):
+        cursor = self.__conn.cursor()
+        cursor.execute("UPDATE postlist SET process_status = %s WHERE uuid = %s", (status, uuid))
+        cursor.close()
+
     def update_filename_server(self, uuid, seq_no, filename):
         cursor = self.__conn.cursor()
         cursor.execute("UPDATE history SET filename_server = %s WHERE uuid = %s AND seq_no = %s",

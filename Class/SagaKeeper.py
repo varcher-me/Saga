@@ -1,12 +1,11 @@
 import time
 from Connector.RedisConnector import RedisConnector
-import Constants.Constants as CT
 from Class.Configure.Configure import Configure
 from Class.Exception.SagaException import *
 from Class.Handler.GdHandler import GdHandler
 from Class.Handler.WordHandler import WordHandler
 from Class.SagaClass import SagaClass
-from Class.SagaFile.SagaFile import SagaFile
+from Class.SagaQueue.SagaQueue import SagaQueue
 from Connector.MySQLConnector import MySQLConnector
 
 
@@ -38,42 +37,25 @@ class SagaKeeper(SagaClass):
             self.mysql().ping()
 
     def do(self):
-        path_init = self.get_param("path_init")
-
-        self.heart_beat()
         while True:
+            self.heart_beat()   # todo 增加未完成列表继续处理
             (uuid_queue, uuid) = self.redis().blpop("INIT_QUEUE", self.__heartInterval)
             if "INIT_QUEUE" == uuid_queue:
                 print("Get jobid = %s" % uuid)
-                file_in_uuid = self.mysql().get_uuid_fileist(uuid)
-                for file_record in file_in_uuid:
-                    file_seq_no = file_record[0]
-                    file_secure_name = file_record[1]
-                    file = SagaFile(path_init, file_secure_name, uuid, file_seq_no)
-                    try:
-                        file.set_mysql(self.mysql())
-                        file.set_redis(self.redis())
-                        file_ext = file.get_file_ext()
-                        if ".gd" == file_ext:
-                            file.set_handler(self.__gdHandler)
-                        elif ".doc" == file_ext or ".docx" == file_ext:
-                            file.set_handler(self.__wordHandler)
-                        else:
-                            except_string = "Unknown ext for file: %s" % (file.get_path_name())
-                            raise FileExtUnknownException(except_string)
+                try:
+                    saga_queue = SagaQueue(uuid)
+                    saga_queue.set_mysql(self.mysql())
+                    saga_queue.set_redis(self.redis())
+                    saga_queue.set_gdhandler(self.__gdHandler)
+                    saga_queue.set_wordhandler(self.__wordHandler)
 
-                        file.process()
+                    saga_queue.load()
+                    saga_queue.process()
+                    saga_queue.done()
 
-                    except FileExtUnknownException as e:
-                        file.update_process_status(CT.CONSTANT_PROCESS_STATUS_FAIL, "INIT", "Unknown ext")
-                        self.mysql().commit()
-                        self.get_logger().warning(str(e))
-
-                    except Exception as e:
-                        except_string = "FATAL ERROR: something error, exception is >>>" + str(e) + "<<<."
-                        print(except_string)
-                        self.redis().lpush("INIT_QUEUE", uuid)  # resave the uuid as the first job
-                        self.get_logger().fatal(except_string)
-                        raise e
-                self.mysql().commit()
-            self.heart_beat()
+                except Exception as e:
+                    except_string = "FATAL ERROR: something error, exception is >>>" + str(e) + "<<<."
+                    print(except_string)
+                    self.redis().lpush("INIT_QUEUE", uuid)  # resave the uuid as the first job
+                    self.get_logger().fatal(except_string)
+                    raise e

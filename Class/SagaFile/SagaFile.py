@@ -196,12 +196,12 @@ class SagaFile(SagaClass):
                 retry_time -= 1
         raise WaitFileTimeOutException("Wait for file " + full_file + " appear timed out.")
 
-    def get_mime_type(self):
-        try:
-            kind = filetype.guess(self.get_path_name())
-        except Exception:
-            return None
-        return kind
+    # def get_mime_type(self):
+    #     try:
+    #         kind = filetype.guess(self.get_path_name())
+    #     except Exception:
+    #         return None
+    #     return kind
 
     def update_process_status(self, status, phase="", comment=""):
         self.mysql().update_status(self.__file_uuid, self.__file_seq_no, status, phase, comment)
