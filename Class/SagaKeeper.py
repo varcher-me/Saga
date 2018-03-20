@@ -4,6 +4,8 @@ from Class.Configure.Configure import Configure
 from Class.Exception.SagaException import *
 from Class.Handler.GdHandler import GdHandler
 from Class.Handler.WordHandler import WordHandler
+from Class.Handler.ExcelHandler import ExcelHandler
+from Class.Handler.PowerPointHandler import PowerPointHandler
 from Class.SagaClass import SagaClass
 from Class.SagaQueue.SagaQueue import SagaQueue
 from Connector.MySQLConnector import MySQLConnector
@@ -12,6 +14,8 @@ from Connector.MySQLConnector import MySQLConnector
 class SagaKeeper(SagaClass):
     __gdHandler = None
     __wordHandler = None
+    __excelHandler = None
+    __powerpointHandler = None
     __configure = None
     __lastHeartTime = 0
     __heartInterval = 0
@@ -21,6 +25,8 @@ class SagaKeeper(SagaClass):
         self.__heartInterval = self.get_param('heart_interval')
         self.__gdHandler = GdHandler()
         self.__wordHandler = WordHandler()
+        self.__excelHandler = ExcelHandler()
+        self.__powerpointHandler = PowerPointHandler()
         self.set_mysql(MySQLConnector())
         self.mysql().conn()
         self.set_redis(RedisConnector())
@@ -48,6 +54,8 @@ class SagaKeeper(SagaClass):
                     saga_queue.set_redis(self.redis())
                     saga_queue.set_gdhandler(self.__gdHandler)
                     saga_queue.set_wordhandler(self.__wordHandler)
+                    saga_queue.set_excelhandler(self.__excelHandler)
+                    saga_queue.set_powerpointhandler(self.__powerpointHandler)
 
                     saga_queue.load()
                     saga_queue.process()

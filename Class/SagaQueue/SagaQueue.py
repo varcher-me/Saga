@@ -8,6 +8,8 @@ class SagaQueue(SagaClass):
     uuid = None
     GDHandler = None
     WordHandler = None
+    ExcelHandler = None
+    PowerPointHandler = None
 
     def __init__(self, uuid):
         SagaClass.__init__(self)
@@ -18,6 +20,12 @@ class SagaQueue(SagaClass):
 
     def set_wordhandler(self, wordhandler):
         self.WordHandler = wordhandler
+
+    def set_excelhandler(self, handler):
+        self.ExcelHandler = handler
+
+    def set_powerpointhandler(self, handler):
+        self.PowerPointHandler = handler
 
     def process(self):
         uuid = self.uuid
@@ -35,6 +43,10 @@ class SagaQueue(SagaClass):
                     file.set_handler(self.GDHandler)
                 elif ".doc" == file_ext or ".docx" == file_ext:
                     file.set_handler(self.WordHandler)
+                elif ".xls" == file_ext or ".xlsx" == file_ext:
+                    file.set_handler(self.ExcelHandler)
+                elif ".ppt" == file_ext or ".pptx" == file_ext:
+                    file.set_handler(self.PowerPointHandler)
                 else:
                     except_string = "Unknown ext for file: %s" % (file.get_path_name())
                     raise FileExtUnknownException(except_string)
